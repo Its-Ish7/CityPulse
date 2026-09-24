@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CityPulse — Live Civic Health Dashboard by Geek Squad</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=DM+Sans:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<style>
+:root{
+  --bg:#090B14;--card:rgba(20,24,43,0.6);--card-border:#2A3151;--ink:#F0F2FA;--mut:#949EB8;
+  --line:#262D4A;--ac:#7C5CFC;--ac-glow:rgba(124,92,252,0.4);
+  box-sizing:border-box;
+}
+*{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--card-border) transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:400 14.5px/1.5 "DM Sans",system-ui,sans-serif;background-image:radial-gradient(circle at 50% 0%, rgba(124,92,252,0.05) 0%, transparent 60%)}
+h1,.big,.st,h2{font-family:"Bricolage Grotesque","DM Sans",sans-serif}
+
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;max-width:1420px;margin:auto;padding:24px 24px 8px}
+h1{font-size:28px;margin:0;font-weight:800;letter-spacing:-.03em;text-shadow:0 0 20px rgba(124,92,252,0.2)}
+h1 span{color:var(--mut);font-weight:500}
+.badge{font-size:12px;font-weight:600;color:#38BDF8;border:1px solid rgba(56,189,248,0.3);border-radius:99px;padding:6px 16px;background:rgba(56,189,248,0.05);box-shadow:0 4px 16px rgba(0,0,0,0.2)}
+
+.g{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);grid-template-areas:"hero map" "detail map" "tl tl";gap:20px;padding:20px 24px;max-width:1420px;margin:auto}
+@media(max-width:980px){.g{grid-template-columns:minmax(0,1fr);grid-template-areas:"hero" "map" "tl" "detail"}}
+
+.card{background:var(--card);border:1px solid var(--card-border);border-radius:24px;padding:24px;min-width:0;box-shadow:0 12px 32px rgba(0,0,0,0.4);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.hero{grid-area:hero}.mp{grid-area:map}.detail{grid-area:detail}.tl{grid-area:tl}
+
+.top{display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.big{font-size:clamp(64px,8vw,104px);font-weight:800;line-height:.8;letter-spacing:-.05em;font-variant-numeric:tabular-nums;text-shadow:0 0 32px rgba(16,163,148,0.3)}
+.st{font:800 24px "Bricolage Grotesque",sans-serif;margin-bottom:2px}.sub{color:var(--mut);font-size:13px}
+canvas{width:100%;height:115px;display:block;margin:16px 0}
+#sum{font-size:16px;margin:8px 0 16px;max-width:65ch;line-height:1.6}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button.c{font:600 13px "DM Sans",sans-serif;color:var(--ink);background:rgba(255,255,255,0.03);border:1px solid var(--card-border);border-radius:99px;padding:6px 16px;cursor:pointer;transition:all .2s cubic-bezier(0.4,0,0.2,1)}
+button.c:hover{background:rgba(255,255,255,0.08);border-color:var(--mut);transform:translateY(-1px)}
+button.c[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:700;box-shadow:0 4px 12px rgba(240,242,250,0.25)}
+button:focus-visible,input:focus-visible,.zn:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+
+#map{height:min(70vh,720px);min-height:420px;border-radius:16px;margin:12px 0;background:#090B13;border:1px solid var(--card-border);box-shadow:inset 0 0 20px rgba(0,0,0,0.5)}
+
+.zn{position:relative;width:38px;height:38px;cursor:pointer}
+.dot,.ring{position:absolute;inset:2px;border-radius:50%;border:2px solid var(--card)}
+.dot{display:grid;place-items:center;box-shadow:0 4px 16px rgba(0,0,0,0.8);background:#8890b0;transition:transform .2s cubic-bezier(0.34,1.56,0.64,1)}
+.zn:hover .dot{transform:scale(1.2)}
+.dot b{font:800 12px "DM Sans",sans-serif;color:#0d1020}
+.ring{animation:rg 2s ease-out infinite}
+.lb{position:absolute;top:42px;left:50%;transform:translateX(-50%);white-space:nowrap;font:700 11.5px "DM Sans",sans-serif;color:var(--ink);text-shadow:0 2px 6px #000;background:rgba(15,18,30,0.9);padding:3px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);backdrop-filter:blur(4px);pointer-events:none}
+
+@keyframes rg{from{transform:scale(1);opacity:.8}to{transform:scale(2.8);opacity:0}}
+@media(prefers-reduced-motion:reduce){.ring{animation:none}}
+
+.lg{height:6px;border-radius:9px;background:linear-gradient(90deg,hsl(170,75%,55%),hsl(60,75%,55%),hsl(-5,75%,55%));max-width:200px;box-shadow:0 0 10px rgba(255,255,255,0.1)}
+.lk{border-left:3px solid var(--ac);padding:8px 12px;margin:12px 0;background:linear-gradient(90deg,rgba(124,92,252,0.1),transparent);border-radius:0 8px 8px 0}
+.lk span,.lk em{display:block;font-size:13.5px;line-height:1.5}.lk em{color:var(--mut);margin-top:4px}
+
+h2{font:800 19px "Bricolage Grotesque",sans-serif;margin:0 0 8px;letter-spacing:-.01em}
+.row{display:grid;grid-template-columns:110px 1fr 90px;gap:16px;align-items:center;padding:12px 0;border-top:1px solid var(--line);transition:background .2s}
+.row:hover{background:rgba(255,255,255,0.02)}
+.row b{font:800 19px "Bricolage Grotesque",sans-serif}.row small{display:block;color:var(--mut);font-size:11.5px;margin-top:2px}
+.row svg{width:100%;height:34px}.row.x{opacity:.4}
+.tag{font-size:11px;font-weight:700;border-radius:99px;padding:4px 10px;justify-self:end;background:rgba(255,255,255,0.05);color:var(--mut);border:1px solid var(--line)}
+.tag.a{background:hsl(-5,75%,55%);color:#fff;border-color:transparent;box-shadow:0 0 12px rgba(220,50,50,0.5)}
+
+.tlr{display:flex;gap:16px;align-items:center}
+#pp{width:44px;height:44px;border-radius:50%;border:0;background:var(--ac);color:#fff;font-size:15px;cursor:pointer;flex:none;box-shadow:0 0 16px var(--ac-glow);transition:all .2s}
+#pp:hover{transform:scale(1.08);background:#8B6DFC}
+.sc{position:relative;flex:1;height:60px}.sc svg{position:absolute;inset:0;width:100%;height:100%}
+input[type=range]{position:absolute;inset:0;width:100%;height:100%;margin:0;background:none;-webkit-appearance:none;appearance:none;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{background:none;height:60px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:60px;border-radius:8px;background:var(--ac);opacity:.6;border:2px solid #fff;box-shadow:0 0 10px rgba(0,0,0,0.5)}
+#tt{min-width:140px;font-weight:700;text-align:right;font-size:14.5px;color:var(--ink)}
+
+footer{max-width:1420px;margin:auto;padding:10px 24px 30px;color:var(--mut);font-size:12.5px;line-height:1.6;display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.geek-squad{color:var(--ac);font-weight:800;letter-spacing:0.5px;background:linear-gradient(90deg, #7C5CFC, #38BDF8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+input.k{font:400 13px "DM Sans",sans-serif;padding:7px 12px;border:1px solid var(--card-border);border-radius:8px;background:rgba(0,0,0,0.2);color:var(--ink);width:200px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>CityPulse <span id="cn">Jaipur</span></h1>
+  <nav class="chips" id="cities">
+    <button class="c" data-c="jaipur">Jaipur</button>
+    <button class="c" data-c="delhi">Delhi</button>
+    <button class="c" data-c="london">London</button>
+  </nav>
+  <span class="badge" id="mode">Connecting to live APIs…</span>
+</header>
+
+<div class="g">
+  <section class="card hero">
+    <div class="top">
+      <div class="big" id="sc">--</div>
+      <div>
+        <div class="st" id="state">Initializing...</div>
+        <div class="sub" id="bpm">Establishing connection</div>
+      </div>
+    </div>
+    <canvas id="ecg" aria-hidden="true"></canvas>
+    <p id="sum" aria-live="polite"></p>
+    <div class="chips">
+      <span class="sub" style="margin-right:4px">Test feed outage degradation:</span>
+      <span class="chips" id="fo"></span>
+    </div>
+    <details id="otdbox" style="margin-top:16px" hidden>
+      <summary class="sub" style="cursor:pointer;font-weight:600;color:var(--ac)">Connect Delhi OTD live bus positions (optional)</summary>
+      <div class="chips" style="margin-top:10px">
+        <input class="k" id="key" placeholder="OTD API key" aria-label="OTD API key">
+        <button class="c" id="otd">Connect Stream</button>
+        <span class="sub" id="otds"></span>
+      </div>
+    </details>
+  </section>
+
+  <section class="card mp">
+    <div class="chips" id="ly"></div>
+    <div id="map"></div>
+    <div class="sub" style="display:flex;gap:12px;align-items:center;margin-top:4px">
+      Calm <div class="lg" style="flex:1"></div> Strained &nbsp;·&nbsp; Click any zone marker to inspect telemetry
+    </div>
+  </section>
+
+  <section class="card detail">
+    <h2>Possible Links / Correlations</h2>
+    <div id="lks"></div>
+    <h2 style="margin-top:28px" id="zt">Zone Telemetry</h2>
+    <div id="zp"></div>
+  </section>
+
+  <section class="card tl">
+    <div class="tlr">
+      <button id="pp" aria-label="Play or pause">❚❚</button>
+      <div class="sc">
+        <svg id="mini" viewBox="0 0 95 40" preserveAspectRatio="none"></svg>
+        <input type="range" id="rg" min="0" max="95" value="60" aria-label="Replay time">
+      </div>
+      <div id="tt"></div>
+    </div>
+    <div class="sub" id="tn" style="margin-top:10px">
+      Historical Pulse (Past 48 Hours). Drag scrubber to replay multi-feed historical correlations.
+    </div>
+  </section>
+</div>
+
+<footer id="ft">
+  <div>Created by <span class="geek-squad">Geek Squad</span> for AmiHacks.</div>
+  <div>Weather & Air: <b>Open-Meteo API</b>. Map tiles: © <b>OpenStreetMap</b> & © <b>CARTO</b>.</div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const $=s=>document.querySelector(s),cl=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
+const OTD_KEY='',TFL_KEY='';
+let sd=7;const r=()=>{sd|=0;sd=sd+0x6D2B79F5|0;let t=Math.imul(sd^sd>>>15,1|sd);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296},g=()=>(r()+r()+r()-1.5)*1.7;
+
+const ell=(a,o,r,q)=>Array.from({length:48},(_,k)=>[a+r*Math.sin(k/7.6394),o+q*Math.cos(k/7.6394)]);
+
+// Geographical Data for Jaipur, Delhi, and London
+const CT={
+  jaipur:{n:'Jaipur',b:[[26.75,75.66],[27.02,75.93]],poly:ell(26.90,75.80,.13,.14),box:[[26.911,75.8075],[26.938,75.833]],z:[["Amity Campus", 27.1755, 75.9582, 0.8, 110],["Jhotwara",26.947,75.75,.8,140],["Vidhyadhar Nagar",26.96,75.78,.7,120],["Sanganer",26.824,75.794,1.2,150],["Jagatpura",26.843,75.865,.9,120],["Bani Park",26.935,75.79,1,130],["Pink City",26.9239,75.8267,1.6,145],["Amer",26.9855,75.8513,.6,105],["Vaishali Nagar",26.905,75.743,.7,110],["Malviya Nagar",26.855,75.82,1.5,130],["Mansarovar",26.85,75.765,1.1,115],["C-Scheme",26.908,75.801,.9,125]]},
+  delhi:{n:'Delhi',b:[[28.40,76.84],[28.89,77.35]],poly:[[28.88,77.13],[28.87,77.22],[28.78,77.30],[28.70,77.34],[28.60,77.34],[28.52,77.32],[28.45,77.25],[28.40,77.16],[28.40,77.08],[28.47,77.00],[28.52,76.92],[28.55,76.85],[28.63,76.84],[28.72,76.87],[28.80,76.93],[28.86,77.03]],river:[[28.88,77.21],[28.80,77.24],[28.72,77.26],[28.66,77.25],[28.61,77.26],[28.56,77.29],[28.50,77.30],[28.44,77.27]],z:[["Rohini",28.7495,77.0565,.5,190],["Mundka",28.6819,77.0305,.5,200],["Wazirpur",28.6996,77.165,.6,200],["Anand Vihar",28.6469,77.316,1.4,210],["Connaught Place",28.6315,77.2167,1.2,150],["ITO / Minto Bridge",28.628,77.241,2,170],["Dwarka",28.5823,77.05,.5,165],["RK Puram",28.566,77.175,.5,145],["Lajpat Nagar",28.5677,77.243,1.5,150],["Okhla",28.531,77.271,1.3,185],["Vasant Kunj",28.52,77.159,.4,130]]},
+  london:{n:'London',b:[[51.28,-0.52],[51.70,0.34]],poly:ell(51.49,-0.10,.205,.42),river:[[51.41,-0.37],[51.485,-0.29],[51.49,-0.23],[51.478,-0.16],[51.50,-0.12],[51.505,-0.075],[51.50,-0.03],[51.485,0.0],[51.49,0.06],[51.50,0.13]],z:[["Heathrow",51.47,-0.4543,.6,60],["Ealing",51.513,-0.3089,.6,50],["Camden",51.539,-0.1426,.7,58],["Hackney",51.545,-0.055,.9,55],["Westminster",51.4975,-0.1357,.8,65],["City of London",51.5155,-0.0922,.8,62],["Croydon",51.3762,-0.0982,.8,48],["Brixton",51.4613,-0.1156,.9,58],["Greenwich",51.4826,0.0077,1.2,52],["Canary Wharf",51.5054,-0.0235,1,55],["Stratford",51.5416,-0.0034,.9,54]]}
+};
+
+let Z=[],C,CK;
+function setZ(k){
+  CK=k;C=CT[k];const b=C.b;
+  Z=C.z.map(([n,la,lo,p,a],i)=>({n,la,lo,p,a,i,cb:4+p*2,x:(lo-b[0][1])/(b[1][1]-b[0][1])*100,y:(b[1][0]-la)/(b[1][0]-b[0][0])*100}))
+}
+setZ('jaipur');
+
+// Configured FEEDS including new metrics
+const F=[
+  {k:'temp',n:'Temperature',fl:1,w:.08},
+  {k:'hum',n:'Humidity',fl:5,w:.07},
+  {k:'cld',n:'Clouds',fl:10,w:.05},
+  {k:'aqi',n:'Air quality',fl:35,w:.25},
+  {k:'rain',n:'Rainfall',fl:1.5,w:.20},
+  {k:'tr',n:'Transit delay',fl:.6,w:.20},
+  {k:'cm',n:'Complaints',fl:1.2,w:.15}
+],N=96,D={temp:[],hum:[],cld:[],aqi:[],rain:[],tr:[],cm:[]};
+
+let LIVE=false,T0=new Date(2026,8,23).getTime(),LO=52;
+const SRC={temp:'Simulated fallback',hum:'Simulated fallback',cld:'Simulated fallback',aqi:'Simulated fallback',rain:'Simulated fallback',tr:'Modelled via rain',cm:'Simulated synthetic'};
+
+function gen(X){
+  sd=7;
+  Z.forEach(z=>{
+    F.forEach(f=>D[f.k][z.i]=[]);
+    let w=0,rc=0;
+    
+    for(let i=0;i<N;i++){
+      const h=i/2%24;let rn=0;
+      
+      // Artificial storm for simulation logic
+      if(i>=72&&i<=84){const cx=15+(i-72)*5.5;rn=Math.max(0,30*Math.sin(Math.PI*(i-72)/12)*Math.exp(-((z.x-cx)**2+(z.y-45)**2)/900)+g()*.3)}
+      if(X)rn=Math.max(0,X.rain[z.i][i]||0);
+      
+      w=w*.92+rn*z.p*.5;
+      rc=rc*.97+rn*.6;
+      const rush=Math.exp(-((h-9)**2)/3)+Math.exp(-((h-18.5)**2)/4);
+      
+      let cm=z.cb*(1+.5*rush)+w*1.6+g()*1.2;if(i>=78&&i<=82&&(z.i==8||z.i==5))cm+=9;
+      let aq=z.a+35*Math.cos((h-3)/24*2*Math.PI)+([0,2,3].includes(z.i)&&i>=38&&i<=52?80*Math.sin(Math.PI*(i-38)/14):0)-Math.min(70,rc*1.2)+g()*5;
+      
+      // Fallback ambient simulations for new variables
+      let tp=28+8*Math.sin((h-8)/24*2*Math.PI)+g()*.5; 
+      let hm=40+25*Math.cos((h-6)/24*2*Math.PI)+g()*2+rn*4; 
+      let cd=20+rn*10+g()*5; 
+
+      if(X&&X.aqi[z.i][i]!=null)aq=X.aqi[z.i][i];
+      if(X&&X.temp&&X.temp[z.i][i]!=null)tp=X.temp[z.i][i];
+      if(X&&X.hum&&X.hum[z.i][i]!=null)hm=X.hum[z.i][i];
+      if(X&&X.cld&&X.cld[z.i][i]!=null)cd=X.cld[z.i][i];
+
+      D.temp[z.i].push(tp);
+      D.hum[z.i].push(Math.max(0,Math.min(100,hm)));
+      D.cld[z.i].push(Math.max(0,Math.min(100,cd)));
+      D.rain[z.i].push(rn);
+      D.tr[z.i].push(Math.max(0,1.5+2.2*rush+w*.9+g()*.4));
+      D.cm[z.i].push(Math.max(0,cm));
+      D.aqi[z.i].push(Math.max(30,aq));
+    }
+  })
+}
+gen();
+
+const off=new Set(),act=()=>F.filter(f=>!off.has(f.k));
+const st=(k,v,z)=>cl(k=='temp'?(v-20)/25:k=='hum'?(v-30)/70:k=='cld'?v/100:k=='aqi'?(v-60)/340:k=='rain'?v/25:k=='tr'?(v-1.5)/14:(v/Z[z].cb-1)/3);
+const score=(z,i)=>{let s=0,w=0;act().forEach(f=>{s+=f.w*st(f.k,D[f.k][z][i],z);w+=f.w});return w?cl(100*(1-1.3*s/w),0,100):null};
+const city=i=>{const a=Z.map(z=>score(z.i,i)).filter(v=>v!=null);return a.length?a.reduce((x,y)=>x+y)/a.length:null};
+const zs=(f,z,i)=>{const a=D[f.k][z].slice(Math.max(0,i-48),i);if(a.length<12)return 0;const m=a.reduce((x,y)=>x+y)/a.length,s=Math.max(Math.sqrt(a.reduce((x,y)=>x+(y-m)**2,0)/a.length),f.fl);return(D[f.k][z][i]-m)/s};
+const anom=(z,i)=>act().filter(f=>zs(f,z,i)>2.5&&(f.k!='rain'||D.rain[z][i]>3)&&(f.k!='aqi'||D.aqi[z][i]>150));
+const aq=v=>LIVE?(v<=50?'Good':v<=100?'Moderate':v<=150?'Unhealthy for sensitive groups':v<=200?'Unhealthy':v<=300?'Very unhealthy':'Hazardous'):(v<=50?'Good':v<=100?'Satisfactory':v<=200?'Moderate':v<=300?'Poor':v<=400?'Very Poor':'Severe');
+const fmt=(k,v)=>k=='temp'?v.toFixed(1):k=='hum'?Math.round(v):k=='cld'?Math.round(v):k=='rain'?v.toFixed(1):k=='tr'?'+'+v.toFixed(1):Math.round(v);
+const U={temp:'°C',hum:'%',cld:'%',aqi:'AQI',rain:'mm/hr',tr:'min late',cm:'per hour'};
+const col=s=>`hsl(${170-cl(s)*175} 75% 55%)`,state=c=>c==null?'No data':c>=65?'Healthy Pulse':c>=45?'Elevated Strain':'Under Stress';
+
+let i=60,layer='pulse',sel=null,play=!matchMedia('(prefers-reduced-motion:reduce)').matches;
+const LY=[['pulse','Overall'],['temp','Temp'],['hum','Humidity'],['cld','Clouds'],['aqi','Air'],['rain','Rain'],['tr','Transit'],['cm','Complaints']];
+
+$('#ly').innerHTML=LY.map(([k,n])=>`<button class="c" data-l="${k}">${n}</button>`).join('');
+$('#fo').innerHTML=F.map(f=>`<button class="c" data-f="${f.k}" aria-pressed="false">${f.n}</button>`).join('');
+
+/* --- MAP TILES WITH OFFICIAL CARTO API KEY --- */
+const M=L.map('map',{zoomControl:false,attributionControl:false,minZoom:8,maxZoom:15});
+// Live Carto API Key implementation
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=cb1_3w7x_1_1a0bb98f9f66fbc574799e98',{
+  subdomains:'abcd',
+  maxZoom:19
+}).addTo(M);
+
+const ML=L.layerGroup().addTo(M),BL=L.layerGroup().addTo(M);
+
+function buildMap(){
+  ML.clearLayers();BL.clearLayers();M.fitBounds(C.b);
+  L.polygon(C.poly,{color:'#7C5CFC',weight:2.5,dashArray:'6 6',fillColor:'#7C5CFC',fillOpacity:.08}).addTo(ML);
+  if(C.river)L.polyline(C.river,{color:'#38BDF8',weight:5,opacity:.8}).addTo(ML);
+  if(C.box)L.rectangle(C.box,{color:'#F43F5E',weight:2,dashArray:'4 5',fillOpacity:.08}).bindTooltip('Walled City').addTo(ML);
+  
+  Z.forEach(z=>L.marker([z.la,z.lo],{
+    icon:L.divIcon({
+      className:'',
+      iconSize:[38,38],
+      iconAnchor:[19,19],
+      html:`<div class="zn" data-i="${z.i}"><i class="ring"></i><i class="dot"><b class="v"></b></i><span class="lb">${z.n}</span></div>`
+    }),
+    title:z.n
+  }).on('click',()=>{sel=sel==z.i?null:z.i;render()}).addTo(ML))
+}
+
+const cv=$('#ecg'),cx=cv.getContext('2d');let ys=[],ph=0,lt=0,bpm=70,ecol='#10A394';
+const ecg=p=>{const b=(c,w,a)=>a*Math.exp(-((p-c)**2)/(2*w*w));return b(.18,.03,.12)-b(.36,.008,.12)+b(.4,.01,1)-b(.44,.01,.28)+b(.68,.04,.22)};
+
+function draw(t){
+  const W=cv.clientWidth,H=cv.clientHeight,d=devicePixelRatio||1;
+  if(cv.width!=W*d){cv.width=W*d;cv.height=H*d}
+  const dt=Math.min(.05,(t-lt)/1000||0);lt=t;const n=Math.floor(W/2.5);ph=(ph+dt*bpm/60)%1;ys.push(ecg(ph));
+  if(ys.length>n)ys.splice(0,ys.length-n);
+  cx.setTransform(d,0,0,d,0,0);cx.clearRect(0,0,W,H);
+  const gr=cx.createLinearGradient(0,0,W,0);gr.addColorStop(0,'transparent');gr.addColorStop(.85,ecol);gr.addColorStop(1,ecol);
+  cx.strokeStyle=gr;cx.lineWidth=3.5;cx.lineJoin='round';cx.shadowColor=ecol;cx.shadowBlur=14;cx.beginPath();
+  ys.forEach((y,j)=>{const x=W-(ys.length-j)*2.5,yy=H*.8-y*H*.75;j?cx.lineTo(x,yy):cx.moveTo(x,yy)});cx.stroke();
+  if(!matchMedia('(prefers-reduced-motion:reduce)').matches||!ys.length||ys.length<n)requestAnimationFrame(draw)
+}
+requestAnimationFrame(draw);
+
+const spark=(k,z)=>{
+  const a=D[k][z].slice(Math.max(0,i-47),i+1),mn=Math.min(...a),mx=Math.max(...a),p=a.map((v,j)=>`${j*100/47},${29-(v-mn)/((mx-mn)||1)*27}`).join(' ');
+  return`<svg viewBox="0 0 100 30" preserveAspectRatio="none"><polygon points="0,30 ${p} ${(a.length-1)*100/47},30" fill="var(--ac)" opacity=".15"/><polyline points="${p}" fill="none" stroke="var(--ac)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`
+};
+
+const bit=(f,z)=>{const v=D[f.k][z.i][i];return f.k=='temp'?`Temp ${v.toFixed(1)}°C`:f.k=='hum'?`Humidity ${Math.round(v)}%`:f.k=='cld'?`Clouds ${Math.round(v)}%`:f.k=='aqi'?`AQI ${Math.round(v)} (${aq(v)})`:f.k=='rain'?`${v.toFixed(0)} mm/hr rain`:f.k=='tr'?`transit ${v.toFixed(0)}m late`:`complaints ${(v/z.cb).toFixed(1)}× normal`};
+
+function render(){
+  const c=city(i),rows=Z.map(z=>({z,s:score(z.i,i),an:anom(z.i,i)})).filter(o=>o.s!=null).sort((a,b)=>a.s-b.s);
+  $('#sc').textContent=c==null?'--':Math.round(c);$('#state').textContent=state(c);
+  bpm=c==null?60:58+(100-c)*1.1;ecol=c==null?'#8890b0':col((100-c)/60);$('#sc').style.color=ecol;$('#state').style.color=ecol;
+  $('#bpm').textContent=c==null?'Data streams interrupted':`City heartbeat · ${Math.round(bpm)} bpm (accelerates with strain)`;
+  const t=new Date(T0+i*18e5);$('#tt').textContent=t.toLocaleString('en-IN',{weekday:'short',hour:'numeric',minute:'2-digit'});
+  
+  let s='';
+  if(rows.length){
+    const w=rows[0],multi=rows.filter(o=>o.an.length>=2);
+    s=`<b>${state(c)}.</b> <b>${w.z.n}</b> is experiencing the most strain (severity score ${Math.round(w.s)})${w.an.length?': '+w.an.map(f=>bit(f,w.z)).join(', ')+'.':'; telemetry is largely nominal.'}`;
+    if(multi.length)s+=` <br><span style="color:var(--mut)">System detected ${multi.length} area${multi.length>1?'s':' '} displaying multi-feed cross-correlations.</span>`;
+  } else s='All telemetry feeds are currently delayed or excluded.';
+  $('#sum').innerHTML=s;
+
+  document.querySelectorAll('[data-c]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.c==CK));
+  document.querySelectorAll('[data-l]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l==layer));
+  document.querySelectorAll('[data-f]').forEach(b=>b.setAttribute('aria-pressed',off.has(b.dataset.f)));
+  
+  document.querySelectorAll('.zn').forEach(e=>{
+    const z=Z[e.dataset.i],sc=score(z.i,i),o=off.has(layer),v=layer=='pulse'?sc:D[layer][z.i][i];
+    const s=sc==null||(layer!='pulse'&&o)?null:layer=='pulse'?(100-sc)/60:st(layer,v,z.i),cc=s==null?'#8890b0':col(s),d=e.querySelector('.dot'),rg=e.querySelector('.ring');
+    d.style.background=cc;rg.style.borderColor=cc;rg.style.animationDuration=(2.4-1.6*cl(s||0))+'s';
+    d.style.outline=sel==z.i?'3px solid #fff':'none';
+    e.querySelector('.v').textContent=s==null?'–':layer=='pulse'?Math.round(v):fmt(layer,v);
+    e.style.opacity=sel==null||sel==z.i?1:.65
+  });
+
+  const ml=rows.filter(o=>o.an.length>=2).sort((a,b)=>b.an.length-a.an.length).slice(0,3);
+  $('#lks').innerHTML=ml.length?ml.map(o=>`<div class="lk"><b>${o.z.n}</b><span>${o.an.map(f=>f.n).join(' + ')} anomalies detected.</span><em>Algorithmic correlation identified across isolated feeds.</em></div>`).join(''):`<div class="lk"><span>No systemic clusters identified. All cross-feed metrics within standard operational thresholds.</span></div>`;
+  
+  const z=sel!=null?Z[sel]:(rows[0]||{z:Z[0]}).z;$('#zt').textContent=z.n+(sel==null?' (Highest Strain)':'');
+  $('#zp').innerHTML=F.map(f=>{
+    const o=off.has(f.k),v=D[f.k][z.i][i],a=!o&&anom(z.i,i).includes(f);
+    // Explicit UI Source Indicator
+    let dotColor = SRC[f.k].includes('Open-Meteo') ? '#10B981' : SRC[f.k].includes('Modelled') ? '#F59E0B' : '#EF4444';
+    let srcHTML = `<span style="display:inline-block;width:6px;height:6px;background:${dotColor};border-radius:50%;margin-right:4px"></span>${SRC[f.k]}`;
+
+    return o?`<div class="row x"><div>${f.n}<small>Feed delayed</small></div><div></div><span class="tag">Excluded</span></div>`:`<div class="row"><div>${f.n}<small>${U[f.k]}<br>${srcHTML}</small></div><div style="display:flex;gap:12px;align-items:center"><b>${fmt(f.k,v)}</b>${spark(f.k,z.i)}</div><span class="tag${a?' a':''}">${a?'Spike Detected':'Nominal'}</span></div>`
+  }).join('');
+
+  const cs=[...Array(N).keys()].map(j=>city(j));
+  $('#mini').innerHTML=cs[0]==null?'':`<polygon points="0,40 ${cs.map((v,j)=>`${j},${40-v*.38}`).join(' ')} 95,40" fill="var(--ac)" opacity=".25"/><polyline points="${cs.map((v,j)=>`${j},${40-v*.38}`).join(' ')}" fill="none" stroke="var(--ac)" stroke-width="2" vector-effect="non-scaling-stroke"/><line x1="${i}" x2="${i}" y1="0" y2="40" stroke="#fff" stroke-width="2" vector-effect="non-scaling-stroke"/>`;
+  $('#rg').value=i;$('#pp').textContent=play?'❚❚':'▶'
+}
+
+document.addEventListener('click',e=>{
+  const cc=e.target.closest('[data-c]'),l=e.target.closest('[data-l]'),f=e.target.closest('[data-f]'),z=e.target.closest('.zn');
+  if(l)layer=l.dataset.l;if(f)off.has(f.dataset.f)?off.delete(f.dataset.f):off.add(f.dataset.f);
+  if(cc)return switchCity(cc.dataset.c);if(e.target.closest('#pp'))play=!play;render()
+});
+
+$('#rg').addEventListener('input',e=>{i=+e.target.value;play=false;render()});
+setInterval(()=>{if(play){i=i>=95?LO:i+1;render()}},1000); // slightly smoother replay speed
+
+async function live(){
+  const my=CK;
+  try{
+    const q=`latitude=${Z.map(z=>z.la)}&longitude=${Z.map(z=>z.lo)}&past_days=2&forecast_days=1&timezone=auto`,J=u=>fetch(u).then(r=>{if(!r.ok)throw 0;return r.json()});
+    const [w,a]=await Promise.all([
+      // Added Humidity and Cloud Cover endpoints
+      J(`https://api.open-meteo.com/v1/forecast?${q}&hourly=precipitation,temperature_2m,relative_humidity_2m,cloud_cover&current=precipitation`),
+      J(`https://air-quality-api.open-meteo.com/v1/air-quality?${q}&hourly=us_aqi`)
+    ]);
+    if(my!=CK)return;
+    const hr=w[0].current.time.slice(0,13)+':00',nw=w[0].hourly.time.indexOf(hr),na=a[0].hourly.time.indexOf(hr);if(nw<48||na<48)throw 0;
+    const up=(arr,n)=>Array.from({length:96},(_,j)=>{const p=n-47.5+j/2,f=Math.floor(p),v0=arr[f],v1=arr[f+1];return v0==null?null:v1==null?v0:v0+(v1-v0)*(p-f)});
+    gen({
+      rain:w.map(x=>up(x.hourly.precipitation,nw)),
+      temp:w.map(x=>up(x.hourly.temperature_2m,nw)),
+      hum:w.map(x=>up(x.hourly.relative_humidity_2m,nw)),
+      cld:w.map(x=>up(x.hourly.cloud_cover,nw)),
+      aqi:a.map(x=>up(x.hourly.us_aqi,na))
+    });
+    LIVE=true;LO=0;T0=new Date(hr).getTime()-95*18e5;
+    
+    // Explicit UI strings for data sources
+    SRC.temp='Live Open-Meteo';SRC.hum='Live Open-Meteo';SRC.cld='Live Open-Meteo';
+    SRC.aqi='Live Open-Meteo';SRC.rain='Live Open-Meteo';
+    SRC.tr='Modelled via rain logic';SRC.cm='Simulated synthetic';
+    
+    i=95;play=false;
+    $('#mode').style.color='#10B981';
+    $('#mode').style.borderColor='rgba(16,185,129,0.3)';
+    $('#mode').style.background='rgba(16,185,129,0.05)';
+    $('#mode').innerHTML='<span style="display:inline-block;width:8px;height:8px;background:#10B981;border-radius:50%;margin-right:6px"></span>Live Data Active';
+  }catch(e){
+    if(my!=CK)return;
+    $('#mode').style.color='#F59E0B';
+    $('#mode').innerHTML='<span style="display:inline-block;width:8px;height:8px;background:#F59E0B;border-radius:50%;margin-right:6px"></span>API Failed: Simulated Fallback';
+  }
+  render()
+}
+
+function switchCity(k){
+  setZ(k);LIVE=false;LO=52;T0=new Date(2026,8,23).getTime();
+  Object.assign(SRC,{temp:'Simulated fallback',hum:'Simulated fallback',cld:'Simulated fallback',aqi:'Simulated fallback',rain:'Simulated fallback',tr:'Modelled via rain',cm:'Simulated synthetic'});
+  gen();sel=null;i=60;play=!matchMedia('(prefers-reduced-motion:reduce)').matches;
+  buildMap();
+  $('#cn').textContent=C.n;$('#otdbox').hidden=k!='delhi';
+  
+  $('#mode').style.color='#38BDF8';
+  $('#mode').style.borderColor='rgba(56,189,248,0.3)';
+  $('#mode').style.background='rgba(56,189,248,0.05)';
+  $('#mode').textContent='Connecting to live APIs…';
+  
+  render();live()
+}
+
+switchCity('jaipur');
+</script>
+</body>
+</html>
