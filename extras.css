@@ -1,0 +1,27 @@
+/* CityPulse extras: ticker, live desk, cities board, community hub */
+@media(min-width:761px){#sb{overflow-y:auto}}
+#tk{position:relative;overflow:hidden;white-space:nowrap;background:var(--ink);color:var(--bg);font:600 13px "Libre Franklin",system-ui,sans-serif}
+#tk>div{display:inline-block;padding:10px 0 10px 96px;animation:tk 70s linear infinite}
+#tk:hover>div{animation-play-state:paused}
+#tk span{margin-right:44px}
+#tk span+span::before{content:"";display:inline-block;width:5px;height:5px;margin-right:44px;border-radius:50%;background:var(--ac);vertical-align:middle}
+.lvb{position:absolute;inset:0 auto 0 0;z-index:1;display:flex;align-items:center;padding:0 16px;background:var(--ac);color:var(--acink);font:700 12px "Libre Franklin",sans-serif}
+@keyframes tk{to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){#tk{overflow-x:auto}#tk>div{animation:none}}
+.xg{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:14px}
+.xg>div,.xg>button{min-width:0}
+.xb{display:block;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.xb:hover{border-color:var(--ac)}
+.xb b.n{display:block;font:600 40px/1 Newsreader,Georgia,serif;letter-spacing:-.02em;margin:8px 0 4px}
+.xb .sub,.xb small{display:block}
+.xs{margin:0 0 22px}
+.xs>.sub{margin:0 0 10px}
+.dys{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:10px}
+.dy{border:1px solid var(--card-border);border-radius:4px;padding:10px;display:flex;flex-direction:column;gap:2px}
+.dy em{font:600 20px Newsreader,Georgia,serif;font-style:normal}
+.dy small{color:var(--mut);font-size:11.5px}
+.nw{display:block;padding:10px 0;border-top:1px solid var(--line);color:var(--ink);text-decoration:none;line-height:1.4}
+.nw:hover{color:var(--ac)}
+.nw small{display:block;color:var(--mut);font-size:12px;margin-top:2px}
+.bdg{opacity:.4}.bdg.on{opacity:1;background:var(--ac);color:var(--acink);border-color:var(--ac)}
+@media print{#tk{display:none}}
