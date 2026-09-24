@@ -3,7 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>CityPulse — Live Civic Health Dashboard by Geek Squad</title>
+  <meta name="description" content="CityPulse turns live weather, air quality and community reports into one civic health score for every neighbourhood.">
+  <meta name="theme-color" content="#6A4E33">
+  <meta property="og:title" content="CityPulse: live civic health dashboard">
+  <meta property="og:description" content="One reading for how your neighbourhood is doing, from live weather, air, hazards and community reports.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%236A4E33'/%3E%3Cpath d='M6 34h14l6-16 10 30 6-14h16' fill='none' stroke='%23FAF5EA' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <title>CityPulse — Live Civic Health Dashboard by Ishaan</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,600;6..72,700&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
   <style>
@@ -208,6 +214,7 @@
     @media print { #sb, .chips, #toast, #tour, #tourBd, footer { display: none !important; } }
     @media(prefers-reduced-motion: reduce) { *, ::before { animation: none !important; transition: none !important; } }
   </style>
+  <link rel="stylesheet" href="extras.css">
 </head>
 <body>
   <div class="app">
@@ -215,6 +222,9 @@
     <aside id="sb">
       <div class="brand">CityPulse<small>Civic health, at a glance</small></div>
       <button class="nv" data-tab="dash" aria-current="true">Dashboard</button>
+      <button class="nv" data-tab="desk" aria-current="false">Live desk</button>
+      <button class="nv" data-tab="world" aria-current="false">Cities</button>
+      <button class="nv" data-tab="hub" aria-current="false">Community</button>
       <button class="nv" data-tab="brief" aria-current="false">Briefing</button>
       <button class="nv" data-tab="health" aria-current="false">Health watch</button>
       <button class="nv" data-tab="alerts" aria-current="false">Alerts</button>
@@ -368,10 +378,16 @@
         <div class="card ab2"><h2>Credits</h2><p>Built by Geek Squad for AmiHacks 1.0. Weather and air quality: Open-Meteo (CC BY 4.0). Maps: OpenStreetMap contributors, CARTO, Esri, Leaflet. Type: Newsreader and Libre Franklin (SIL Open Font License).</p></div>
       </section>
 
+      <section id="v-desk" class="view pg"><h1 class="pt">Live desk</h1><p class="sub">Real-time feeds for the selected city: forecast, air chemistry, natural hazards and local headlines. Each block names its source.</p><div id="xd"></div></section>
+      <section id="v-world" class="view pg"><h1 class="pt">Cities</h1><p class="sub">Live air quality in twelve cities, ranked worst first. Open one for the full dashboard, or search for your own.</p>
+        <div class="chips" style="margin-top:14px"><input class="k" id="cs" placeholder="Search any city" aria-label="Search any city"><button class="c" id="cb">Search</button><button class="c" id="cl">Use my location</button></div>
+        <div class="xg" id="cr"></div><h2 style="margin-top:26px">Live air ranking</h2><div class="xg" id="wl"></div></section>
+      <section id="v-hub" class="view pg"><h1 class="pt">Community</h1><p class="sub">Check in, follow zones and earn points. Everything is stored in your browser.</p><div class="hg"><div class="card" id="xci"></div><div class="side"><div class="card" id="xpt"></div><div class="card" id="xtr"></div></div></div></section>
+
       <!-- Footer -->
       <footer id="ft">
         <div>Created by <span class="geek-squad">Geek Squad</span> for AmiHacks.</div>
-        <div>Weather & Air: <b>Open-Meteo API</b>. COVID data: <b>disease.sh</b>. Map tiles: © <b>OpenStreetMap</b> contributors, © <b>CARTO</b>; satellite imagery © <b>Esri</b>. Mapping: <b>Leaflet</b>.</div>
+        <div>Weather & Air: <b>Open-Meteo API</b>. COVID data: <b>disease.sh</b>. Map tiles: © <b>OpenStreetMap</b> contributors, © <b>CARTO</b>; satellite imagery © <b>Esri</b>. Mapping: <b>Leaflet</b>. Hazards: <b>USGS</b> and <b>NASA EONET</b>. Headlines: <b>Google News</b> via rss2json. Geocoding: <b>Open-Meteo</b>.</div>
       </footer>
     </main>
   </div>
@@ -517,7 +533,7 @@
     /* --- MAP TILES WITH SATELLITE & CARTO SWITCHER --- */
     const M = L.map('map', { zoomControl: false, attributionControl: true, minZoom: 8, maxZoom: 15 });
     
-    const bt = n => L.tileLayer(`https://{s}.basemaps.cartocdn.com/${n}/{z}/{x}/{y}{r}.png?key=cb1_3w7x_1_1a0bb98f9f66fbc574799e98`, { subdomains: 'abcd', maxZoom: 19, attribution: '© OpenStreetMap contributors © CARTO' });
+    const bt = n => L.tileLayer(`https://{s}.basemaps.cartocdn.com/${n}/{z}/{x}/{y}{r}.png`, { subdomains: 'abcd', maxZoom: 19, attribution: '© OpenStreetMap contributors © CARTO' });
 const lightT = bt('light_all'), darkT = bt('dark_all'), satTiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Imagery © Esri' });
     let isSatellite = false;
 swapTiles();
@@ -709,7 +725,7 @@ swapTiles();
     }
 
     async function covid() {
-      const my = CK, box = $('#cv'); $('#cvt').textContent = 'COVID-19 · ' + (C.cc == 'uk' ? 'United Kingdom' : 'India'); box.innerHTML = '<div class="sub">Loading from disease.sh…</div>';
+      const my = CK, box = $('#cv'); $('#cvt').textContent = 'COVID-19 · ' + (C.cn || (C.cc == 'uk' ? 'United Kingdom' : 'India')); box.innerHTML = '<div class="sub">Loading from disease.sh…</div>';
       try {
         const [a, h] = await Promise.all([fetch('https://disease.sh/v3/covid-19/countries/' + C.cc).then(r => r.json()), fetch('https://disease.sh/v3/covid-19/historical/' + C.cc + '?lastdays=31').then(r => r.json())]);
 if (my != CK) return;
@@ -893,5 +909,6 @@ const s = Object.values(timelineObj.cases), d = s.slice(1).map((v, j) => Math.ma
     switchCity('jaipur');
     if (!store.get('cp-tour')) setTimeout(() => tour(0), 700);
   </script>
+  <script src="extras.js"></script>
 </body>
 </html>
