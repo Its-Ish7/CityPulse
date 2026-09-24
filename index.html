@@ -1,59 +1,31 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>CityPulse — Live Civic Health Dashboard by Geek Squad</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=DM+Sans:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,600;6..72,700&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
   <style>
-    /* Base Variables & Theme Engine */
-    :root[data-theme=dark] {
-      --bg: #000;
-      --sb: #050505;
-      --card: #0d0d0d;
-      --card-border: #2b2b2b;
-      --ink: #ececec;
-      --mut: #8c8c8c;
-      --line: #222;
-      --ac: #c4c4c4;
-      --acrgb: 196,196,196;
-      --acink: #000;
-      --ac-glow: rgba(196,196,196,.25);
-      --sh: none;
-      color-scheme: dark;
-    }
-    :root[data-theme=light] {
-      --bg: #f3f4f6;
-      --sb: #fff;
-      --card: #fff;
-      --card-border: #e2e5ea;
-      --ink: #111318;
-      --mut: #5f6673;
-      --line: #e8eaee;
-      --ac: #3f4652;
-      --acrgb: 63,70,82;
-      --acink: #fff;
-      --ac-glow: rgba(63,70,82,.2);
-      --sh: 0 4px 16px rgba(0,0,0,.06);
-      color-scheme: light;
-    }
+    /* Theme: cream and umber (light), warm charcoal (dark) */
+    :root[data-theme=light] { --bg:#F1E8D8; --sb:#EADFCB; --card:#FAF5EA; --card-border:#D6C7AC; --ink:#2B2117; --mut:#6B5A45; --line:#E2D6BF; --ac:#6A4E33; --acrgb:106,78,51; --acink:#FAF5EA; --ac-glow:transparent; --sh:0 1px 0 rgba(90,64,36,.06); --ok:#5F7A4E; --wr:#A87B2A; --bad:#9C3D2E; color-scheme:light; }
+    :root[data-theme=dark] { --bg:#17130F; --sb:#1C1814; --card:#211C16; --card-border:#3B3227; --ink:#ECE3D2; --mut:#A39680; --line:#2E271E; --ac:#C8A97E; --acrgb:200,169,126; --acink:#17130F; --ac-glow:transparent; --sh:none; --ok:#8FAE7C; --wr:#D2A650; --bad:#D97A66; color-scheme:dark; }
 
     /* Global Reset & Typography */
     * { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--card-border) transparent; }
-    html, body { margin: 0; background: var(--bg); color: var(--ink); font: 400 14.5px/1.5 "DM Sans", system-ui, sans-serif; }
-    h1, .big, .st, h2 { font-family: "Bricolage Grotesque", "DM Sans", sans-serif; }
+    html, body { margin: 0; background: var(--bg); color: var(--ink); font: 400 14.5px/1.5 "Libre Franklin", system-ui, sans-serif; }
+    h1, .big, .st, h2 { font-family: Newsreader, Georgia, serif; }
 
     /* Layout & Sidebar */
     .app { display: flex; align-items: flex-start; }
     main { flex: 1; min-width: 0; }
     #sb { width: 220px; flex: none; position: sticky; top: 0; height: 100vh; background: var(--sb); border-right: 1px solid var(--card-border); padding: 22px 14px; display: flex; flex-direction: column; gap: 6px; z-index: 2000; }
-    .brand { font: 800 22px "Bricolage Grotesque", sans-serif; letter-spacing: -.03em; margin: 0 0 18px 14px; }
+    .brand { font: 800 22px Newsreader, Georgia, serif; letter-spacing: -.03em; margin: 0 0 18px 14px; }
     .sp { flex: 1; }
     .cr2 { text-align: center; margin-top: 12px; }
     
     /* Navigation */
-    .nv { font: 600 14.5px "DM Sans", sans-serif; text-align: left; color: var(--mut); background: none; border: 0; border-radius: 10px; padding: 11px 14px; cursor: pointer; white-space: nowrap; }
+    .nv { font: 600 14.5px "Libre Franklin", system-ui, sans-serif; text-align: left; color: var(--mut); background: none; border: 0; border-radius: 10px; padding: 11px 14px; cursor: pointer; white-space: nowrap; }
     .nv:hover { background: rgba(var(--acrgb), .1); color: var(--ink); }
     .nv[aria-current=true] { background: var(--ac); color: var(--acink); }
 
@@ -78,42 +50,42 @@
     .card { background: var(--card); border: 1px solid var(--card-border); border-radius: 24px; padding: 24px; min-width: 0; box-shadow: var(--sh); }
     .top { display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap; }
     .big { font-size: clamp(64px, 8vw, 104px); font-weight: 800; line-height: .8; letter-spacing: -.05em; font-variant-numeric: tabular-nums; text-shadow: 0 0 32px rgba(16,163,148,0.3); }
-    .st { font: 800 24px "Bricolage Grotesque", sans-serif; margin-bottom: 2px; }
+    .st { font: 800 24px Newsreader, Georgia, serif; margin-bottom: 2px; }
     .sub { color: var(--mut); font-size: 13px; }
     canvas { width: 100%; height: 115px; display: block; margin: 16px 0; }
     #sum { font-size: 16px; margin: 8px 0 16px; max-width: 65ch; line-height: 1.6; }
 
     /* Inputs & Buttons */
     .chips { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-    button.c { font: 600 13px "DM Sans", sans-serif; color: var(--ink); background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 99px; padding: 6px 16px; cursor: pointer; transition: all .2s cubic-bezier(0.4,0,0.2,1); }
+    button.c { font: 600 13px "Libre Franklin", system-ui, sans-serif; color: var(--ink); background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 99px; padding: 6px 16px; cursor: pointer; transition: all .2s cubic-bezier(0.4,0,0.2,1); }
     button.c:hover { background: rgba(255,255,255,0.08); border-color: var(--mut); transform: translateY(-1px); }
     button.c[aria-pressed=true] { background: var(--ink); color: var(--bg); border-color: var(--ink); font-weight: 700; box-shadow: 0 4px 12px rgba(240,242,250,0.25); }
     button:focus-visible, input:focus-visible, .zn:focus-visible { outline: 2px solid var(--ac); outline-offset: 2px; }
-    input.k, select.k { font: 400 13px "DM Sans", sans-serif; padding: 7px 12px; border: 1px solid var(--card-border); border-radius: 8px; background: var(--bg); color: var(--ink); width: 200px; }
+    input.k, select.k { font: 400 13px "Libre Franklin", system-ui, sans-serif; padding: 7px 12px; border: 1px solid var(--card-border); border-radius: 8px; background: var(--bg); color: var(--ink); width: 200px; }
 
     /* Map Styles */
     #map { height: min(70vh, 720px); min-height: 420px; border-radius: 16px; margin: 12px 0; background: #090B13; border: 1px solid var(--card-border); box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
     .zn { position: relative; width: 38px; height: 38px; cursor: pointer; }
     .dot, .ring { position: absolute; inset: 2px; border-radius: 50%; border: 2px solid var(--card); }
-    .dot { display: grid; place-items: center; box-shadow: 0 4px 16px rgba(0,0,0,0.8); background: #8890b0; transition: transform .2s cubic-bezier(0.34,1.56,0.64,1); }
+    .dot { display: grid; place-items: center; box-shadow: 0 4px 16px rgba(0,0,0,0.8); background: #8a7d69; transition: transform .2s cubic-bezier(0.34,1.56,0.64,1); }
     .zn:hover .dot { transform: scale(1.2); }
-    .dot b { font: 800 12px "DM Sans", sans-serif; color: #0d1020; }
+    .dot b { font: 800 12px "Libre Franklin", system-ui, sans-serif; color: #0d1020; }
     .ring { animation: rg 2s ease-out infinite; }
-    .lb { position: absolute; top: 42px; left: 50%; transform: translateX(-50%); white-space: nowrap; font: 700 11.5px "DM Sans", sans-serif; color: var(--ink); background: var(--card); padding: 3px 8px; border-radius: 6px; border: 1px solid var(--card-border); pointer-events: none; }
+    .lb { position: absolute; top: 42px; left: 50%; transform: translateX(-50%); white-space: nowrap; font: 700 11.5px "Libre Franklin", system-ui, sans-serif; color: var(--ink); background: var(--card); padding: 3px 8px; border-radius: 6px; border: 1px solid var(--card-border); pointer-events: none; }
     
     @keyframes rg { from { transform: scale(1); opacity: .8; } to { transform: scale(2.8); opacity: 0; } }
     @media(prefers-reduced-motion: reduce) { .ring { animation: none; } }
-    :root.tf[data-theme=dark] .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(1.5) contrast(1.25) saturate(.4); }
+    :root[data-theme=light] .leaflet-tile-pane { filter: sepia(.4) saturate(.75) contrast(.95); } :root[data-theme=dark] .leaflet-tile-pane { filter: sepia(.25) brightness(.95); }
 
     /* Dashboard Details */
-    .lg { height: 6px; border-radius: 9px; background: linear-gradient(90deg, hsl(170,75%,55%), hsl(60,75%,55%), hsl(-5,75%,55%)); max-width: 200px; box-shadow: 0 0 10px rgba(255,255,255,0.1); }
+    .lg { height: 6px; border-radius: 9px; background: linear-gradient(90deg, hsl(140 36% 42%), hsl(75 36% 42%), hsl(5 40% 42%)); max-width: 200px; box-shadow: 0 0 10px rgba(255,255,255,0.1); }
     .lk { border-left: 3px solid var(--ac); padding: 8px 12px; margin: 12px 0; background: linear-gradient(90deg, rgba(var(--acrgb),0.1), transparent); border-radius: 0 8px 8px 0; }
     .lk span, .lk em { display: block; font-size: 13.5px; line-height: 1.5; }
     .lk em { color: var(--mut); margin-top: 4px; }
-    h2 { font: 800 19px "Bricolage Grotesque", sans-serif; margin: 0 0 8px; letter-spacing: -.01em; }
+    h2 { font: 800 19px Newsreader, Georgia, serif; margin: 0 0 8px; letter-spacing: -.01em; }
     .row { display: grid; grid-template-columns: 110px 1fr 90px; gap: 16px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); transition: background .2s; }
     .row:hover { background: rgba(255,255,255,0.02); }
-    .row b { font: 800 19px "Bricolage Grotesque", sans-serif; }
+    .row b { font: 800 19px Newsreader, Georgia, serif; }
     .row small { display: block; color: var(--mut); font-size: 11.5px; margin-top: 2px; }
     .row svg { width: 100%; height: 34px; }
     .row.x { opacity: .4; }
@@ -139,20 +111,20 @@
     .side { display: flex; flex-direction: column; gap: 20px; }
     @media(max-width: 900px) { .fl, .hg { grid-template-columns: minmax(0, 1fr); } .pf { position: static !important; } }
     .pf { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 20px; }
-    .pf h3, .ad h3 { margin: 0; font: 800 17px "Bricolage Grotesque", sans-serif; }
+    .pf h3, .ad h3 { margin: 0; font: 800 17px Newsreader, Georgia, serif; }
     .pf .k, .pf .tx { width: 100%; }
-    .tx { font: 400 14px "DM Sans", sans-serif; padding: 10px 12px; border: 1px solid var(--card-border); border-radius: 8px; background: var(--bg); color: var(--ink); resize: vertical; }
+    .tx { font: 400 14px "Libre Franklin", system-ui, sans-serif; padding: 10px 12px; border: 1px solid var(--card-border); border-radius: 8px; background: var(--bg); color: var(--ink); resize: vertical; }
     .pr { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
     .fu { cursor: pointer; font-weight: 600; font-size: 13px; padding: 7px 12px; border: 1px solid var(--card-border); border-radius: 8px; }
-    .sb2 { margin-left: auto; font: 700 13px "DM Sans", sans-serif; background: var(--ac); color: var(--acink); border: 0; border-radius: 8px; padding: 8px 18px; cursor: pointer; }
+    .sb2 { margin-left: auto; font: 700 13px "Libre Franklin", system-ui, sans-serif; background: var(--ac); color: var(--acink); border: 0; border-radius: 8px; padding: 8px 18px; cursor: pointer; }
     .lst { display: flex; flex-direction: column; gap: 14px; margin-top: 12px; }
     .po p { margin: 10px 0; line-height: 1.55; overflow-wrap: anywhere; }
     .ph { display: flex; gap: 12px; align-items: center; }
     .ph .tag { margin-left: auto; justify-self: auto; }
-    .av { width: 34px; height: 34px; border-radius: 50%; background: var(--line); display: grid; place-items: center; font: 700 14px "DM Sans", sans-serif; font-style: normal; flex: none; }
+    .av { width: 34px; height: 34px; border-radius: 50%; background: var(--line); display: grid; place-items: center; font: 700 14px "Libre Franklin", system-ui, sans-serif; font-style: normal; flex: none; }
     .pi { width: 100%; max-height: 420px; object-fit: cover; border-radius: 10px; border: 1px solid var(--card-border); }
     .pa { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
-    .ab { font: 700 13px "DM Sans", sans-serif; color: var(--mut); background: none; border: 1px solid var(--card-border); border-radius: 99px; padding: 5px 12px; cursor: pointer; }
+    .ab { font: 700 13px "Libre Franklin", system-ui, sans-serif; color: var(--mut); background: none; border: 1px solid var(--card-border); border-radius: 99px; padding: 5px 12px; cursor: pointer; }
     .ab.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
     .cm { padding: 8px 0; border-top: 1px solid var(--line); font-size: 13.5px; overflow-wrap: anywhere; }
     .cr { display: flex; gap: 8px; margin-top: 8px; }
@@ -176,19 +148,82 @@
       #sb { width: auto; height: auto; flex-direction: row; overflow-x: auto; padding: 8px; border-right: 0; border-bottom: 1px solid var(--card-border); }
       .brand, .sp, .cr2 { display: none; }
     }
+
+    /* ---- Editorial refinements ---- */
+    body { -webkit-font-smoothing: antialiased; }
+    .card { border-radius: 4px; }
+    header { border-bottom: 3px double var(--card-border); margin-bottom: 8px; padding-bottom: 14px; }
+    header h1 { font-size: 36px; font-weight: 700; letter-spacing: -.01em; text-shadow: none; line-height: 1.05; }
+    .date { font: 600 12px "Libre Franklin", sans-serif; color: var(--mut); margin-bottom: 4px; }
+    .pt { font-size: 34px; line-height: 1.1; margin-bottom: 6px; } .pg > .sub { max-width: 62ch; }
+    .brand { font-size: 27px; font-weight: 700; letter-spacing: -.01em; margin: 0 0 20px 14px; }
+    .brand small { display: block; font: 500 11.5px/1.4 "Libre Franklin", sans-serif; color: var(--mut); letter-spacing: 0; margin-top: 2px; }
+    .big { font-weight: 600; text-shadow: none; letter-spacing: -.03em; line-height: .85; }
+    .st, h2, .pf h3, .ad h3 { font-weight: 700; } h2 { font-size: 20px; letter-spacing: 0; }
+    .nv, button.c, .tag, input.k, select.k, .tx, .fu, .sb2, .ab, #pp { border-radius: 4px; }
+    button.c { background: transparent; padding: 6px 13px; } button.c:hover { background: rgba(var(--acrgb), .1); transform: none; }
+    button.c[aria-pressed=true] { background: var(--ac); color: var(--acink); border-color: var(--ac); box-shadow: none; }
+    .tag { background: transparent; } .tag.a { background: var(--bad); color: #fff; box-shadow: none; }
+    .lg, #pp { box-shadow: none; } #pp:hover { background: var(--mut); transform: none; }
+    .lk { background: rgba(var(--acrgb), .07); border-radius: 0 4px 4px 0; } .row:hover { background: rgba(var(--acrgb), .05); }
+    .badge { display: inline-flex; align-items: center; gap: 8px; color: var(--mut); background: transparent; border: 1px solid var(--card-border); border-radius: 4px; box-shadow: none; }
+    .badge::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--mut); }
+    .badge.ok { color: var(--ok); } .badge.ok::before { background: var(--ok); } .badge.warn { color: var(--wr); } .badge.warn::before { background: var(--wr); }
+    .geek-squad { background: none; -webkit-text-fill-color: currentColor; color: var(--ink); }
+    #map { background: var(--line); box-shadow: none; border-radius: 4px; }
+    .leaflet-control-attribution { background: var(--card) !important; color: var(--mut) !important; font-size: 10px; } .leaflet-control-attribution a { color: var(--ac) !important; }
+    input[type=range]::-webkit-slider-thumb { border-color: var(--card); box-shadow: none; }
+    #rg::-moz-range-track { background: none; } #rg::-moz-range-thumb { width: 14px; height: 60px; border-radius: 6px; background: var(--ac); opacity: .6; border: 2px solid var(--card); }
+    input[type=range].rs { position: relative; inset: auto; height: 24px; }
+    .rs::-webkit-slider-runnable-track { height: 4px; background: var(--line); border-radius: 2px; }
+    .rs::-webkit-slider-thumb { height: 16px; width: 16px; border-radius: 50%; margin-top: -6px; opacity: 1; background: var(--ac); }
+    .rs::-moz-range-track { height: 4px; background: var(--line); } .rs::-moz-range-thumb { height: 16px; width: 16px; border-radius: 50%; background: var(--ac); border: 0; opacity: 1; }
+    .th { display: block; margin: 18px 0; } .th span { display: flex; justify-content: space-between; margin-bottom: 6px; font-weight: 600; font-size: 13.5px; }
+    .chk { display: flex; gap: 8px; align-items: center; font-size: 13.5px; margin-top: 18px; }
+    .view.on { animation: fadein .3s ease; } .br i { transform-origin: left; animation: grow .8s ease-out; } .zn { animation: zin .5s cubic-bezier(.2,.8,.2,1) backwards; }
+    @keyframes fadein { from { opacity: 0; } } @keyframes grow { from { transform: scaleX(0); } } @keyframes zin { from { opacity: 0; transform: scale(.4); } }
+    .paper { max-width: 720px; margin-top: 16px; padding: 28px 32px; font: 400 18px/1.65 Newsreader, Georgia, serif; }
+    .paper .hd { font-size: 32px; line-height: 1.15; margin: 0 0 6px; } .paper .by { margin: 0 0 18px; padding-bottom: 12px; border-bottom: 1px solid var(--line); color: var(--mut); font: 600 12.5px "Libre Franklin", sans-serif; }
+    .paper .lead { font-size: 21px; } .paper h3 { font-size: 19px; margin: 22px 0 6px; } .paper .sub { font: 400 13px/1.5 "Libre Franklin", sans-serif; }
+    .ab2 { margin-top: 16px; max-width: 900px; } .ab2 p, .ab2 li { line-height: 1.65; max-width: 72ch; }
+    table.src { width: 100%; border-collapse: collapse; font-size: 13.5px; } .src th, .src td { text-align: left; padding: 9px 8px; border-top: 1px solid var(--line); }
+    .arch { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; } .arch > div { border: 1px solid var(--card-border); border-radius: 4px; padding: 12px; font-size: 13px; line-height: 1.5; } .arch h3 { margin: 0 0 6px; font-size: 15px; }
+    .hl { outline: 2px solid var(--ac); outline-offset: 5px; scroll-margin-top: 12px; }
+    #tourBd { position: fixed; inset: 0; background: rgba(20,14,8,.55); z-index: 3500; }
+    #tour { position: fixed; z-index: 3600; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(520px, calc(100vw - 24px)); background: var(--card); border: 1px solid var(--ac); border-radius: 6px; padding: 18px 20px; box-shadow: 0 12px 40px rgba(0,0,0,.35); animation: fadein .25s; }
+    #tour.intro { top: 50%; bottom: auto; transform: translate(-50%, -50%); width: min(560px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: auto; }
+    #tour h2 { margin: 0 0 6px; font-size: 22px; } #tour p { margin: 0; line-height: 1.55; } #tourU { margin: 10px 0 0; padding-left: 18px; font-size: 13.5px; line-height: 1.6; }
+    .tf2 { display: flex; gap: 8px; align-items: center; margin-top: 16px; flex-wrap: wrap; } .tf2 .sub { margin-right: auto; }
+    #tourNext { background: var(--ac); color: var(--acink); border-color: var(--ac); }
+    @media(min-width: 761px) { #sb { height: 100dvh; } }
+    @media(max-width: 760px) {
+      #sb { position: fixed; top: auto; bottom: 0; left: 0; right: 0; width: auto; height: auto; flex-direction: row; gap: 2px; overflow-x: auto; padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); border: 0; border-top: 1px solid var(--card-border); z-index: 2500; }
+      .nv, #sb .c { flex: none; padding: 9px 12px; font-size: 13px; } main { padding-bottom: 76px; }
+      header, .g, .pg { padding-left: 14px; padding-right: 14px; } header h1 { font-size: 30px; } .g { gap: 14px; } .card { padding: 16px; }
+      #map { height: 56vh; min-height: 340px; } .lb { display: none; } input.k { width: 100%; }
+      .row { grid-template-columns: 96px 1fr 76px; gap: 10px; } .hz { grid-template-columns: 88px 1fr 1fr; gap: 8px; }
+      .tlr { flex-wrap: wrap; } #tt { min-width: 0; flex: 1; } .arch { grid-template-columns: 1fr; } .paper { padding: 20px 18px; font-size: 17px; }
+      #toast { bottom: calc(80px + env(safe-area-inset-bottom)); } #tour:not(.intro) { bottom: calc(66px + env(safe-area-inset-bottom)); }
+    }
+    @media print { #sb, .chips, #toast, #tour, #tourBd, footer { display: none !important; } }
+    @media(prefers-reduced-motion: reduce) { *, ::before { animation: none !important; transition: none !important; } }
   </style>
 </head>
 <body>
   <div class="app">
     <!-- Sidebar -->
     <aside id="sb">
-      <div class="brand">CityPulse</div>
+      <div class="brand">CityPulse<small>Civic health, at a glance</small></div>
       <button class="nv" data-tab="dash" aria-current="true">Dashboard</button>
+      <button class="nv" data-tab="brief" aria-current="false">Briefing</button>
       <button class="nv" data-tab="health" aria-current="false">Health watch</button>
+      <button class="nv" data-tab="alerts" aria-current="false">Alerts</button>
       <button class="nv" data-tab="feed" aria-current="false">Hygiene reports</button>
       <button class="nv" data-tab="safety" aria-current="false">Safety and travel</button>
+      <button class="nv" data-tab="about" aria-current="false">Method</button>
       <div class="sp"></div>
-      <button class="c" id="tg">Switch to light</button>
+      <button class="c" id="tourbtn" onclick="tour(0)">Take the tour</button>
+      <button class="c" id="tg">Switch to dark</button>
       <div class="sub cr2">Built by <span class="geek-squad">Geek Squad</span></div>
     </aside>
 
@@ -196,13 +231,13 @@
       <!-- Dashboard View -->
       <div id="v-dash" class="view on">
         <header>
-          <h1>CityPulse <span id="cn">Jaipur</span></h1>
-          <nav class="chips" id="cities">
+          <div><div class="date" id="dl"></div><h1>CityPulse <span id="cn">Jaipur</span></h1></div>
+          <nav class="chips" id="cities" aria-label="City">
             <button class="c" data-c="jaipur">Jaipur</button>
             <button class="c" data-c="delhi">Delhi</button>
             <button class="c" data-c="london">London</button>
           </nav>
-          <span class="badge" id="mode">Connecting to live APIs…</span>
+          <span class="badge" id="mode" role="status">Connecting to live data…</span>
         </header>
 
         <div class="g">
@@ -217,32 +252,25 @@
             <canvas id="ecg" aria-hidden="true"></canvas>
             <p id="sum" aria-live="polite"></p>
             <div class="chips">
-              <span class="sub" style="margin-right:4px">Test feed outage degradation:</span>
+              <span class="sub" style="margin-right:4px">Simulate a feed outage:</span>
               <span class="chips" id="fo"></span>
             </div>
-            <details id="otdbox" style="margin-top:16px" hidden>
-              <summary class="sub" style="cursor:pointer;font-weight:600;color:var(--ac)">Connect Delhi OTD live bus positions (optional)</summary>
-              <div class="chips" style="margin-top:10px">
-                <input class="k" id="key" placeholder="OTD API key" aria-label="OTD API key">
-                <button class="c" id="otd">Connect Stream</button>
-                <span class="sub" id="otds"></span>
-              </div>
-            </details>
+            
           </section>
 
           <section class="card mp">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
               <div class="chips" id="ly" style="margin:0;"></div>
-              <button class="c" id="map-toggle" onclick="toggleMapStyle()" aria-pressed="false">🗺️ Satellite View</button>
+              <button class="c" id="map-toggle" onclick="toggleMapStyle()" aria-pressed="false">Satellite view</button>
             </div>
             <div id="map"></div>
             <div class="sub" style="display:flex;gap:12px;align-items:center;margin-top:4px">
-              Calm <div class="lg" style="flex:1"></div> Strained &nbsp;·&nbsp; Click any zone marker to inspect telemetry
+              Calm <div class="lg" style="flex:1"></div> Strained. Select a marker to inspect a zone.
             </div>
           </section>
 
           <section class="card detail">
-            <h2>Possible Links / Correlations</h2>
+            <h2>Possible links between feeds</h2>
             <div id="lks"></div>
             <h2 style="margin-top:28px" id="zt">Zone Telemetry</h2>
             <div id="zp"></div>
@@ -280,7 +308,7 @@
               <div id="cv"></div>
             </div>
             <div class="card">
-              <h2>Citizen reports in this city</h2>
+              <h2>Citizen reports in this city (includes samples)</h2>
               <div class="chips" id="hr"></div>
             </div>
           </div>
@@ -304,14 +332,55 @@
         <div id="fs"></div>
       </section>
 
+      <section id="v-brief" class="view pg">
+        <h1 class="pt">Daily briefing</h1>
+        <p class="sub">A plain-language bulletin written from the readings on the dashboard. Links between feeds are possible connections, not confirmed causes.</p>
+        <article class="card paper" id="bf" aria-live="polite"></article>
+        <div class="chips" style="margin-top:14px"><button class="c" id="bfCopy">Copy briefing</button><button class="c" onclick="print()">Print</button></div>
+      </section>
+
+      <section id="v-alerts" class="view pg">
+        <h1 class="pt">Alerts</h1>
+        <p class="sub">Set the levels that matter to you. CityPulse checks every zone in the selected city against them.</p>
+        <div class="hg">
+          <div class="card"><h2>Your thresholds</h2><div id="th"></div><label class="chk"><input type="checkbox" id="nt"> Send a browser notification when a threshold is crossed</label></div>
+          <div class="card"><h2 id="alt">Over threshold</h2><div id="al"></div></div>
+        </div>
+      </section>
+
+      <section id="v-about" class="view pg">
+        <h1 class="pt">Method and sources</h1>
+        <p class="sub">How CityPulse turns separate feeds into one reading, and which parts are real and which are modelled.</p>
+        <div class="card ab2"><h2>Purpose</h2><p>Residents often learn about a flooded underpass or a bad air day only after they are in it. CityPulse brings weather, air quality, rainfall, transit delay and complaint data into one reading from 0 to 100 for every neighbourhood, flags readings that are unusual for that place, and explains them in plain language. Built for AmiHacks 1.0, Track B: The Live Civic Health Dashboard.</p></div>
+        <div class="card ab2"><h2>Data feeds</h2><div style="overflow-x:auto"><table class="src"><thead><tr><th>Feed</th><th>Source</th><th>Status</th><th>Weight</th></tr></thead><tbody id="srcb"></tbody></table></div></div>
+        <div class="card ab2"><h2>How the pipeline works</h2><div class="arch">
+          <div><h3>1. Collect</h3>Open-Meteo weather and air quality. Transit delay and complaints are modelled because no open city feed is available.</div>
+          <div><h3>2. Normalise</h3>Each feed becomes a half-hourly series per zone, on one timeline and one set of units.</div>
+          <div><h3>3. Analyse</h3>A weighted strain score per zone, then a spike test against that zone's own last 24 hours. Two or more spikes in one zone are shown as a possible link.</div>
+          <div><h3>4. Present</h3>Pulse and map, 48-hour replay, briefing, alerts and health watch.</div></div></div>
+        <div class="card ab2"><h2>How the score is calculated</h2><p>Each feed is scaled from calm (0) to strained (1), multiplied by its weight, and averaged. The zone score is 100 minus 1.3 times that strain, kept between 0 and 100. The city pulse is the average across zones. A spike means a reading more than 2.5 standard deviations above the zone's own recent average. This is plain statistics, not machine learning.</p></div>
+        <div class="card ab2"><h2>Privacy, honesty and limits</h2><ul>
+          <li>No personal data is collected. Community posts stay in your own browser and are never uploaded. Please do not name or photograph identifiable people.</li>
+          <li>Posts marked "Sample post" are illustrative placeholders, not real reports.</li>
+          <li>If live weather cannot be reached, CityPulse plays a scripted demo scenario (a storm and a pollution episode). It is labelled as simulated wherever it appears.</li>
+          <li>The COVID-19 figures are national totals from disease.sh and may be out of date.</li>
+          <li>This is a prototype, not an official warning system. In an emergency, contact your local emergency services.</li></ul></div>
+        <div class="card ab2"><h2>Credits</h2><p>Built by Geek Squad for AmiHacks 1.0. Weather and air quality: Open-Meteo (CC BY 4.0). Maps: OpenStreetMap contributors, CARTO, Esri, Leaflet. Type: Newsreader and Libre Franklin (SIL Open Font License).</p></div>
+      </section>
+
       <!-- Footer -->
       <footer id="ft">
         <div>Created by <span class="geek-squad">Geek Squad</span> for AmiHacks.</div>
-        <div>Weather & Air: <b>Open-Meteo API</b>. COVID data: <b>disease.sh</b>. Dark map: © <b>Esri</b>. Map tiles: © <b>OpenStreetMap</b> & © <b>CARTO</b>.</div>
+        <div>Weather & Air: <b>Open-Meteo API</b>. COVID data: <b>disease.sh</b>. Map tiles: © <b>OpenStreetMap</b> contributors, © <b>CARTO</b>; satellite imagery © <b>Esri</b>. Mapping: <b>Leaflet</b>.</div>
       </footer>
     </main>
   </div>
   
+  <div id="tourBd" hidden></div>
+  <section id="tour" role="dialog" aria-labelledby="tourT" hidden>
+    <h2 id="tourT"></h2><p id="tourP"></p><ul id="tourU"></ul>
+    <div class="tf2"><span class="sub" id="tourDots"></span><button class="c" id="tourSkip">Skip</button><button class="c" id="tourBack">Back</button><button class="c" id="tourNext">Next</button></div>
+  </section>
   <div id="toast"></div>
 
   <!-- Scripts -->
@@ -319,7 +388,7 @@
   <script>
     const $ = s => document.querySelector(s);
     const cl = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
-    const OTD_KEY = '', TFL_KEY = '';
+    const D0 = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime() - 864e5; };
     let DASH = true;
     
     // Seeded Random Generator
@@ -336,7 +405,7 @@
     // Geographical Data
     const CT = {
       jaipur: {
-        n: 'Jaipur', cc: 'india', b: [[26.75, 75.66], [27.02, 75.93]], poly: ell(26.90, 75.80, .13, .14), box: [[26.911, 75.8075], [26.938, 75.833]],
+        n: 'Jaipur', cc: 'india', b: [[26.76, 75.66], [27.22, 76.0]], poly: ell(26.90, 75.80, .13, .14), box: [[26.911, 75.8075], [26.938, 75.833]],
         z: [
           ["Amity Campus", 27.1755, 75.9582, 0.8, 110], ["Jhotwara", 26.947, 75.75, .8, 140], ["Vidhyadhar Nagar", 26.96, 75.78, .7, 120],
           ["Sanganer", 26.824, 75.794, 1.2, 150], ["Jagatpura", 26.843, 75.865, .9, 120], ["Bani Park", 26.935, 75.79, 1, 130],
@@ -385,7 +454,7 @@
       { k: 'cm', n: 'Complaints', fl: 1.2, w: .15 }
     ], N = 96, D = { temp: [], hum: [], cld: [], aqi: [], rain: [], tr: [], cm: [] };
 
-    let LIVE = false, T0 = new Date(2026, 8, 23).getTime(), LO = 52;
+    let TZ, LIVE = false, T0 = D0(), LO = 52;
     const SRC = { temp: 'Simulated fallback', hum: 'Simulated fallback', cld: 'Simulated fallback', aqi: 'Simulated fallback', rain: 'Simulated fallback', tr: 'Modelled via rain', cm: 'Simulated synthetic' };
 
     function gen(X) {
@@ -432,12 +501,12 @@
     const st = (k, v, z) => cl(k == 'temp' ? (v - 20) / 25 : k == 'hum' ? (v - 30) / 70 : k == 'cld' ? v / 100 : k == 'aqi' ? (v - 60) / 340 : k == 'rain' ? v / 25 : k == 'tr' ? (v - 1.5) / 14 : (v / Z[z].cb - 1) / 3);
     const score = (z, i) => { let s = 0, w = 0; act().forEach(f => { s += f.w * st(f.k, D[f.k][z][i], z); w += f.w; }); return w ? cl(100 * (1 - 1.3 * s / w), 0, 100) : null; };
     const city = i => { const a = Z.map(z => score(z.i, i)).filter(v => v != null); return a.length ? a.reduce((x, y) => x + y) / a.length : null; };
-    const zs = (f, z, i) => { const a = D[f.k][z].slice(Math.max(0, i - 48), i); if (a.length < 12) return 0; const m = a.reduce((x, y) => x + y) / a.length, s = Math.max(Math.sqrt(a.reduce((x, y) => x + (y - m) ** 2, 0) / a.length), f.fl); return (D[f.k][z][i] - m) / s; };
+    const zs = (f, z, i) => { const a = D[f.k][z].slice(Math.max(0, i - 48), i); if (a.length < 12) return 0; const m = a.reduce((x, y) => x + y, 0) / a.length, s = Math.max(Math.sqrt(a.reduce((x, y) => x + (y - m) ** 2, 0) / a.length), f.fl || 1); return (D[f.k][z][i] - m) / (s || 1); };
     const anom = (z, i) => act().filter(f => zs(f, z, i) > 2.5 && (f.k != 'rain' || D.rain[z][i] > 3) && (f.k != 'aqi' || D.aqi[z][i] > 150));
-    const aq = v => LIVE ? (v <= 50 ? 'Good' : v <= 100 ? 'Moderate' : v <= 150 ? 'Unhealthy for sensitive groups' : v <= 200 ? 'Unhealthy' : v <= 300 ? 'Very unhealthy' : 'Hazardous') : (v <= 50 ? 'Good' : v <= 100 ? 'Satisfactory' : v <= 200 ? 'Moderate' : v <= 300 ? 'Poor' : v <= 400 ? 'Very Poor' : 'Severe');
+    const aq = v => v <= 50 ? 'Good' : v <= 100 ? 'Moderate' : v <= 150 ? 'Unhealthy for sensitive groups' : v <= 200 ? 'Unhealthy' : v <= 300 ? 'Very unhealthy' : 'Hazardous';
     const fmt = (k, v) => k == 'temp' ? v.toFixed(1) : k == 'hum' ? Math.round(v) : k == 'cld' ? Math.round(v) : k == 'rain' ? v.toFixed(1) : k == 'tr' ? '+' + v.toFixed(1) : Math.round(v);
     const U = { temp: '°C', hum: '%', cld: '%', aqi: 'AQI', rain: 'mm/hr', tr: 'min late', cm: 'per hour' };
-    const col = s => `hsl(${170 - cl(s) * 175} 75% 55%)`, state = c => c == null ? 'No data' : c >= 65 ? 'Healthy Pulse' : c >= 45 ? 'Elevated Strain' : 'Under Stress';
+    const SL = () => document.documentElement.dataset.theme == 'dark' ? 55 : 40, col = s => `hsl(${140 - cl(s) * 135} 36% ${SL()}%)`, state = c => c == null ? 'No data' : c >= 65 ? 'Healthy Pulse' : c >= 45 ? 'Elevated Strain' : 'Under Stress';
 
     let i = 60, layer = 'pulse', sel = null, play = !matchMedia('(prefers-reduced-motion:reduce)').matches;
     const LY = [['pulse', 'Overall'], ['temp', 'Temp'], ['hum', 'Humidity'], ['cld', 'Clouds'], ['aqi', 'Air'], ['rain', 'Rain'], ['tr', 'Transit'], ['cm', 'Complaints']];
@@ -446,44 +515,33 @@
     $('#fo').innerHTML = F.map(f => `<button class="c" data-f="${f.k}" aria-pressed="false">${f.n}</button>`).join('');
 
     /* --- MAP TILES WITH SATELLITE & CARTO SWITCHER --- */
-    const M = L.map('map', { zoomControl: false, attributionControl: false, minZoom: 8, maxZoom: 15 });
+    const M = L.map('map', { zoomControl: false, attributionControl: true, minZoom: 8, maxZoom: 15 });
     
-    const cartoTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=cb1_3w7x_1_1a0bb98f9f66fbc574799e98', { subdomains: 'abcd', maxZoom: 19 });
-    const satTiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 });
-
-    cartoTiles.addTo(M);
+    const bt = n => L.tileLayer(`https://{s}.basemaps.cartocdn.com/${n}/{z}/{x}/{y}{r}.png?key=cb1_3w7x_1_1a0bb98f9f66fbc574799e98`, { subdomains: 'abcd', maxZoom: 19, attribution: '© OpenStreetMap contributors © CARTO' });
+const lightT = bt('light_all'), darkT = bt('dark_all'), satTiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Imagery © Esri' });
     let isSatellite = false;
+swapTiles();
 
     function toggleMapStyle() {
-      isSatellite = !isSatellite;
-      const btn = document.getElementById('map-toggle');
-      if (isSatellite) {
-        M.removeLayer(cartoTiles);
-        satTiles.addTo(M);
-        btn.innerHTML = '🗺️ Street View';
-        btn.setAttribute('aria-pressed', 'true');
-      } else {
-        M.removeLayer(satTiles);
-        cartoTiles.addTo(M);
-        btn.innerHTML = '🗺️ Satellite View';
-        btn.setAttribute('aria-pressed', 'false');
-      }
+      isSatellite = !isSatellite; const btn = $('#map-toggle');
+      if (isSatellite) { M.removeLayer(lightT); M.removeLayer(darkT); satTiles.addTo(M); } else { M.removeLayer(satTiles); swapTiles(); }
+      btn.textContent = isSatellite ? 'Street map' : 'Satellite view'; btn.setAttribute('aria-pressed', isSatellite);
     }
 
     const ML = L.layerGroup().addTo(M), BL = L.layerGroup().addTo(M);
 
     function buildMap() {
       ML.clearLayers(); BL.clearLayers(); M.fitBounds(C.b);
-      L.polygon(C.poly, { color: '#8a8a8a', weight: 2.5, dashArray: '6 6', fillColor: '#8a8a8a', fillOpacity: .08 }).addTo(ML);
-      if (C.river) L.polyline(C.river, { color: '#38BDF8', weight: 5, opacity: .8 }).addTo(ML);
-      if (C.box) L.rectangle(C.box, { color: '#F43F5E', weight: 2, dashArray: '4 5', fillOpacity: .08 }).bindTooltip('Walled City').addTo(ML);
+      L.polygon(C.poly, { color: '#8a7457', weight: 2.5, dashArray: '6 6', fillColor: '#8a7457', fillOpacity: .08 }).addTo(ML);
+      if (C.river) L.polyline(C.river, { color: '#5f7f92', weight: 5, opacity: .8 }).addTo(ML);
+      if (C.box) L.rectangle(C.box, { color: '#9c3d2e', weight: 2, dashArray: '4 5', fillOpacity: .08 }).bindTooltip('Walled City').addTo(ML);
       
       Z.forEach(z => L.marker([z.la, z.lo], {
         icon: L.divIcon({
           className: '',
           iconSize: [38, 38],
           iconAnchor: [19, 19],
-          html: `<div class="zn" data-i="${z.i}"><i class="ring"></i><i class="dot"><b class="v"></b></i><span class="lb">${z.n}</span></div>`
+          html: `<div class="zn" data-i="${z.i}" style="animation-delay:${z.i * 45}ms"><i class="ring"></i><i class="dot"><b class="v"></b></i><span class="lb">${z.n}</span></div>`
         }),
         title: z.n
       }).on('click', () => { sel = sel == z.i ? null : z.i; render(); }).addTo(ML));
@@ -500,7 +558,7 @@
       if (ys.length > n) ys.splice(0, ys.length - n);
       cx.setTransform(d, 0, 0, d, 0, 0); cx.clearRect(0, 0, W, H);
       const gr = cx.createLinearGradient(0, 0, W, 0); gr.addColorStop(0, 'transparent'); gr.addColorStop(.85, ecol); gr.addColorStop(1, ecol);
-      cx.strokeStyle = gr; cx.lineWidth = 3.5; cx.lineJoin = 'round'; cx.shadowColor = ecol; cx.shadowBlur = 14; cx.beginPath();
+      cx.strokeStyle = gr; cx.lineWidth = 2.5; cx.lineJoin = 'round'; cx.shadowColor = ecol; cx.shadowBlur = 0; cx.beginPath();
       ys.forEach((y, j) => { const x = W - (ys.length - j) * 2.5, yy = H * .8 - y * H * .75; j ? cx.lineTo(x, yy) : cx.moveTo(x, yy); });
       cx.stroke();
       if (!matchMedia('(prefers-reduced-motion:reduce)').matches || !ys.length || ys.length < n) requestAnimationFrame(draw);
@@ -512,20 +570,20 @@
       return `<svg viewBox="0 0 100 30" preserveAspectRatio="none"><polygon points="0,30 ${p} ${(a.length - 1) * 100 / 47},30" fill="var(--ac)" opacity=".15"/><polyline points="${p}" fill="none" stroke="var(--ac)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
     };
 
-    const bit = (f, z) => { const v = D[f.k][z.i][i]; return f.k == 'temp' ? `Temp ${v.toFixed(1)}°C` : f.k == 'hum' ? `Humidity ${Math.round(v)}%` : f.k == 'cld' ? `Clouds ${Math.round(v)}%` : f.k == 'aqi' ? `AQI ${Math.round(v)} (${aq(v)})` : f.k == 'rain' ? `${v.toFixed(0)} mm/hr rain` : f.k == 'tr' ? `transit ${v.toFixed(0)}m late` : `complaints ${(v / z.cb).toFixed(1)}× normal`; };
+    const bit = (f, z, n = i) => { const v = D[f.k][z.i][n]; return f.k == 'temp' ? `Temp ${v.toFixed(1)}°C` : f.k == 'hum' ? `Humidity ${Math.round(v)}%` : f.k == 'cld' ? `Clouds ${Math.round(v)}%` : f.k == 'aqi' ? `AQI ${Math.round(v)} (${aq(v)})` : f.k == 'rain' ? `${v.toFixed(0)} mm/hr rain` : f.k == 'tr' ? `transit ${v.toFixed(0)}m late` : `complaints ${(v / z.cb).toFixed(1)}× normal`; };
 
     function render() {
       const c = city(i), rows = Z.map(z => ({ z, s: score(z.i, i), an: anom(z.i, i) })).filter(o => o.s != null).sort((a, b) => a.s - b.s);
-      $('#sc').textContent = c == null ? '--' : Math.round(c); $('#state').textContent = state(c);
-      bpm = c == null ? 60 : 58 + (100 - c) * 1.1; ecol = c == null ? '#8890b0' : col((100 - c) / 60); $('#sc').style.color = ecol; $('#state').style.color = ecol;
+      tween($('#sc'), c); $('#state').textContent = state(c);
+      bpm = c == null ? 60 : 58 + (100 - c) * 1.1; ecol = c == null ? '#8a7d69' : col((100 - c) / 60); $('#sc').style.color = ecol; $('#state').style.color = ecol;
       $('#bpm').textContent = c == null ? 'Data streams interrupted' : `City heartbeat · ${Math.round(bpm)} bpm (accelerates with strain)`;
-      const t = new Date(T0 + i * 18e5); $('#tt').textContent = t.toLocaleString('en-IN', { weekday: 'short', hour: 'numeric', minute: '2-digit' });
+      const t = new Date(T0 + i * 18e5); $('#tt').textContent = t.toLocaleString('en-IN', { weekday: 'short', hour: 'numeric', minute: '2-digit', timeZone: TZ });
       
       let s = '';
       if (rows.length) {
         const w = rows[0], multi = rows.filter(o => o.an.length >= 2);
         s = `<b>${state(c)}.</b> <b>${w.z.n}</b> is experiencing the most strain (severity score ${Math.round(w.s)})${w.an.length ? ': ' + w.an.map(f => bit(f, w.z)).join(', ') + '.' : '; telemetry is largely nominal.'}`;
-        if (multi.length) s += ` <br><span style="color:var(--mut)">System detected ${multi.length} area${multi.length > 1 ? 's' : ' '} displaying multi-feed cross-correlations.</span>`;
+        if (multi.length) s += ` <br><span style="color:var(--mut)">${multi.length} area${multi.length > 1 ? 's show' : ' shows'} several feeds moving together. That is a possible link, not a confirmed cause.</span>`;
       } else { s = 'All telemetry feeds are currently delayed or excluded.'; }
       $('#sum').innerHTML = s;
 
@@ -535,7 +593,7 @@
       
       document.querySelectorAll('.zn').forEach(e => {
         const z = Z[e.dataset.i], sc = score(z.i, i), o = off.has(layer), v = layer == 'pulse' ? sc : D[layer][z.i][i];
-        const s = sc == null || (layer != 'pulse' && o) ? null : layer == 'pulse' ? (100 - sc) / 60 : st(layer, v, z.i), cc = s == null ? '#8890b0' : col(s), d = e.querySelector('.dot'), rg = e.querySelector('.ring');
+        const s = sc == null || (layer != 'pulse' && o) ? null : layer == 'pulse' ? (100 - sc) / 60 : st(layer, v, z.i), cc = s == null ? '#8a7d69' : col(s), d = e.querySelector('.dot'), rg = e.querySelector('.ring');
         d.style.background = cc; rg.style.borderColor = cc; rg.style.animationDuration = (2.4 - 1.6 * cl(s || 0)) + 's';
         d.style.outline = sel == z.i ? '3px solid var(--ink)' : 'none';
         e.querySelector('.v').textContent = s == null ? '–' : layer == 'pulse' ? Math.round(v) : fmt(layer, v);
@@ -543,7 +601,7 @@
       });
 
       const ml = rows.filter(o => o.an.length >= 2).sort((a, b) => b.an.length - a.an.length).slice(0, 3);
-      $('#lks').innerHTML = ml.length ? ml.map(o => `<div class="lk"><b>${o.z.n}</b><span>${o.an.map(f => f.n).join(' + ')} anomalies detected.</span><em>Algorithmic correlation identified across isolated feeds.</em></div>`).join('') : `<div class="lk"><span>No systemic clusters identified. All cross-feed metrics within standard operational thresholds.</span></div>`;
+      $('#lks').innerHTML = ml.length ? ml.map(o => `<div class="lk"><b>${o.z.n}</b><span>${o.an.map(f => f.n).join(' + ')} anomalies detected.</span><em>A coincidence in timing. It is a possible link, not a confirmed cause.</em></div>`).join('') : `<div class="lk"><span>No systemic clusters identified. All cross-feed metrics within standard operational thresholds.</span></div>`;
       
       const z = sel != null ? Z[sel] : (rows[0] || { z: Z[0] }).z; $('#zt').textContent = z.n + (sel == null ? ' (Highest Strain)' : '');
       $('#zp').innerHTML = F.map(f => {
@@ -576,7 +634,7 @@
           J(`https://air-quality-api.open-meteo.com/v1/air-quality?${q}&hourly=us_aqi`)
         ]);
         if (my != CK) return;
-        const hr = w[0].current.time.slice(0, 13) + ':00', nw = w[0].hourly.time.indexOf(hr), na = a[0].hourly.time.indexOf(hr); if (nw < 48 || na < 48) throw 0;
+        const hr = w[0].current.time.slice(0, 14) + '00', nw = w[0].hourly.time.indexOf(hr), na = a[0].hourly.time.indexOf(hr); if (nw < 48 || na < 48) throw 0;
         const up = (arr, n) => Array.from({ length: 96 }, (_, j) => { const p = n - 47.5 + j / 2, f = Math.floor(p), v0 = arr[f], v1 = arr[f + 1]; return v0 == null ? null : v1 == null ? v0 : v0 + (v1 - v0) * (p - f); });
         gen({
           rain: w.map(x => up(x.hourly.precipitation, nw)),
@@ -585,36 +643,29 @@
           cld: w.map(x => up(x.hourly.cloud_cover, nw)),
           aqi: a.map(x => up(x.hourly.us_aqi, na))
         });
-        LIVE = true; LO = 0; T0 = new Date(hr).getTime() - 95 * 18e5;
+        LIVE = true; LO = 0; TZ = w[0].timezone; T0 = Date.parse(hr + 'Z') - w[0].utc_offset_seconds * 1e3 - 95 * 18e5;
         
         SRC.temp = 'Live Open-Meteo'; SRC.hum = 'Live Open-Meteo'; SRC.cld = 'Live Open-Meteo';
         SRC.aqi = 'Live Open-Meteo'; SRC.rain = 'Live Open-Meteo';
         SRC.tr = 'Modelled via rain logic'; SRC.cm = 'Simulated synthetic';
         
         i = 95; play = false;
-        $('#mode').style.color = '#10B981';
-        $('#mode').style.borderColor = 'rgba(16,185,129,0.3)';
-        $('#mode').style.background = 'rgba(16,185,129,0.05)';
-        $('#mode').innerHTML = '<span style="display:inline-block;width:8px;height:8px;background:#10B981;border-radius:50%;margin-right:6px"></span>Live Data Active';
+        setMode('ok', 'Live weather and air data');
       } catch (e) {
         if (my != CK) return;
-        $('#mode').style.color = '#F59E0B';
-        $('#mode').innerHTML = '<span style="display:inline-block;width:8px;height:8px;background:#F59E0B;border-radius:50%;margin-right:6px"></span>API Failed: Simulated Fallback';
+        setMode('warn', 'Live feed unreachable · simulated scenario');
       }
       render(); refreshViews();
     }
 
     function switchCity(k) {
-      setZ(k); LIVE = false; LO = 52; T0 = new Date(2026, 8, 23).getTime();
+      setZ(k); LIVE = false; TZ = undefined; LO = 52; T0 = D0();
       Object.assign(SRC, { temp: 'Simulated fallback', hum: 'Simulated fallback', cld: 'Simulated fallback', aqi: 'Simulated fallback', rain: 'Simulated fallback', tr: 'Modelled via rain', cm: 'Simulated synthetic' });
       gen(); sel = null; i = 60; play = !matchMedia('(prefers-reduced-motion:reduce)').matches;
       buildMap();
-      $('#cn').textContent = C.n; $('#otdbox').hidden = k != 'delhi';
+      $('#cn').textContent = C.n;
       
-      $('#mode').style.color = '#38BDF8';
-      $('#mode').style.borderColor = 'rgba(56,189,248,0.3)';
-      $('#mode').style.background = 'rgba(56,189,248,0.05)';
-      $('#mode').textContent = 'Connecting to live APIs…';
+      setMode('', 'Connecting to live data…');
       
       render(); fillAreas(); refreshViews(); covid(); live();
     }
@@ -627,11 +678,8 @@
     const UID = store.get('cp-uid') || (() => { const u = 'u' + Math.random().toString(36).slice(2); store.set('cp-uid', u); return u; })();
     const NOW = () => LIVE ? 95 : i;
 
-    const ES = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/', TD = L.layerGroup([L.tileLayer(ES + 'World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16 }), L.tileLayer(ES + 'World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16 })]); let tdFail = 0;
-    TD.eachLayer(l => l.on('tileerror', () => { if (++tdFail == 4) swapTiles(); }));
-    
-    function swapTiles() { const d = document.documentElement.dataset.theme == 'dark', useD = d && tdFail < 4; M.removeLayer(useD ? cartoTiles : TD); M.addLayer(useD ? TD : cartoTiles); document.documentElement.classList.toggle('tf', d && !useD); }
-    function setTheme(t) { document.documentElement.dataset.theme = t; store.set('cp-theme', t); $('#tg').textContent = t == 'dark' ? 'Switch to light' : 'Switch to AMOLED dark'; swapTiles(); }
+    function swapTiles() { if (isSatellite) return; const d = document.documentElement.dataset.theme == 'dark'; M.removeLayer(d ? lightT : darkT); (d ? darkT : lightT).addTo(M); }
+    function setTheme(t) { document.documentElement.dataset.theme = t; store.set('cp-theme', t); $('#tg').textContent = t == 'dark' ? 'Switch to light' : 'Switch to dark'; swapTiles(); render(); refreshViews(); }
     $('#tg').onclick = () => setTheme(document.documentElement.dataset.theme == 'dark' ? 'light' : 'dark');
 
     function tab(id) {
@@ -664,40 +712,45 @@
       const my = CK, box = $('#cv'); $('#cvt').textContent = 'COVID-19 · ' + (C.cc == 'uk' ? 'United Kingdom' : 'India'); box.innerHTML = '<div class="sub">Loading from disease.sh…</div>';
       try {
         const [a, h] = await Promise.all([fetch('https://disease.sh/v3/covid-19/countries/' + C.cc).then(r => r.json()), fetch('https://disease.sh/v3/covid-19/historical/' + C.cc + '?lastdays=31').then(r => r.json())]);
-        if (my != CK) return;
-        const s = Object.values((Array.isArray(h) ? h[0] : h).timeline.cases), d = s.slice(1).map((v, j) => Math.max(0, v - s[j])), mx = Math.max(...d, 1);
-        box.innerHTML = `<div class="row" style="grid-template-columns:1fr 1fr 1fr"><div><b>${a.todayCases.toLocaleString()}</b><small>new today</small></div><div><b>${a.active.toLocaleString()}</b><small>active</small></div><div><b>${a.casesPerOneMillion.toLocaleString()}</b><small>per million</small></div></div><svg class="cvs" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="${d.map((v, j) => `${j * 100 / (d.length - 1)},${29 - v / mx * 27}`).join(' ')}" fill="none" stroke="var(--ac)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg><div class="sub">Daily new cases, last 30 days. National figures, updated ${new Date(a.updated).toLocaleString()}.</div>`;
+if (my != CK) return;
+const timelineObj = Array.isArray(h) ? h[0]?.timeline : h?.timeline;
+if (!timelineObj || !timelineObj.cases) throw new Error("COVID timeline payload unavailable");
+const s = Object.values(timelineObj.cases), d = s.slice(1).map((v, j) => Math.max(0, v - s[j])), mx = Math.max(...d, 1);
+        box.innerHTML = `<div class="row" style="grid-template-columns:1fr 1fr 1fr"><div><b>${a.todayCases.toLocaleString()}</b><small>new today</small></div><div><b>${a.active.toLocaleString()}</b><small>active</small></div><div><b>${a.casesPerOneMillion.toLocaleString()}</b><small>per million</small></div></div><svg class="cvs" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="${d.map((v, j) => `${j * 100 / (d.length - 1)},${29 - v / mx * 27}`).join(' ')}" fill="none" stroke="var(--ac)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg><div class="sub">Daily new cases, last 30 days. National figures, last updated ${new Date(a.updated).toLocaleDateString()}${Date.now() - a.updated > 30 * 864e5 ? '. This source has stopped refreshing, so treat these numbers as historical.' : '.'}</div>`;
       } catch (e) { if (my == CK) box.innerHTML = '<div class="sub">The disease.sh feed could not be reached, so nothing is shown.</div>'; }
     }
 
     /* --- Safety: Live Conditions --- */
-    function renderSafety() {
-      const n = NOW(), out = [];
+    function adv(n) {
+      const out = [];
       Z.forEach(z => {
         const t = D.temp[z.i][n], r = D.rain[z.i][n], q = D.aqi[z.i][n];
         if (r >= 3) out.push([3, z.n, 'Heavy rain', r.toFixed(1) + ' mm/hr. Expect flooded roads and slow traffic. Avoid underpasses.']);
         if (t >= 38) out.push([2, z.n, 'Extreme heat', Math.round(t) + '°C. Move walking tours to early morning or evening and carry water.']);
         if (q > 150) out.push([2, z.n, 'Poor air', 'AQI ' + Math.round(q) + '. Limit long outdoor exposure, especially for children and people with asthma.']);
       });
-      out.sort((a, b) => b[0] - a[0]);
+      return out.sort((a, b) => b[0] - a[0]);
+    }
+    function renderSafety() {
+      const out = adv(NOW());
       $('#sa').innerHTML = out.length ? out.slice(0, 6).map(o => `<div class="card ad"><span class="tag a">${o[2]}</span><h3>${o[1]}</h3><p>${o[3]}</p></div>`).join('') : `<div class="card sub">No weather-driven advisories for ${C.n} right now.</div>`;
     }
 
-    function refreshViews() { renderHealth(); renderSafety(); }
+    function refreshViews() { renderHealth(); renderSafety(); renderBrief(); renderAlerts(); renderAbout(); }
     function fillAreas() { document.querySelectorAll('.ar').forEach(s => s.innerHTML = Z.map(z => `<option>${z.n}</option>`).join('') + '<option>Other</option>'); }
 
     /* --- Community Feeds (Hygiene & Safety) --- */
-    const SEV = { 'Avoid': '#EF4444', 'Use caution': '#F59E0B', 'Tourist-friendly': '#10B981' };
+    const SEV = { 'Avoid': 'var(--bad)', 'Use caution': 'var(--wr)', 'Tourist-friendly': 'var(--ok)' };
     const FEEDS = {
       hygiene: { el: '#fh', key: 'cp-hyg', title: 'Report a hazard', ph: 'What did you see, and where?', cats: ['Open sewer', 'Dead animal', 'Unsafe food handling', 'Stagnant water', 'Garbage', 'Other'], seed: [
-        [12, 'Aman S. (sample)', 'Stagnant water', 'Vidhyadhar Nagar', 'Waterlogging outside the sector 2 market has stood since the rain. It smells and mosquitoes are visible.', 24],
-        [95, 'Priya R. (sample)', 'Unsafe food handling', 'Pink City', 'A stall near the bazaar was cutting fruit on the ground beside an open drain. Inspectors should take a look.', 9],
-        [240, 'Rohit M. (sample)', 'Open sewer', 'Sanganer', 'Open drain along the main road, uncovered for weeks. Children walk past it to school.', 15]
+        [12, 'Sample post', 'Stagnant water', 'Vidhyadhar Nagar', 'Waterlogging outside the sector 2 market has stood since the rain. It smells and mosquitoes are visible.', 24],
+        [95, 'Sample post', 'Unsafe food handling', 'Pink City', 'A stall near the bazaar was cutting fruit on the ground beside an open drain. Inspectors should take a look.', 9],
+        [240, 'Sample post', 'Open sewer', 'Sanganer', 'Open drain along the main road, uncovered for weeks. Children walk past it to school.', 15]
       ]},
       safety: { el: '#fs', key: 'cp-saf', title: 'Share a safety tip', ph: 'Which place, and what should visitors know?', cats: ['Avoid', 'Use caution', 'Tourist-friendly'], seed: [
-        [30, 'Neha K. (sample)', 'Use caution', 'Pink City', 'Crowded around Hawa Mahal in the evening. Keep bags zipped and phones in a front pocket.', 18],
-        [180, 'Dev P. (sample)', 'Tourist-friendly', 'C-Scheme', 'Well lit, busy cafes and a visible police presence in the evening. Comfortable for solo visitors.', 11],
-        [300, 'Sara T. (sample)', 'Avoid', 'Jhotwara', 'Unlit stretch near the underpass after dark. Take a cab instead of walking.', 7]
+        [30, 'Sample post', 'Use caution', 'Pink City', 'Crowded around Hawa Mahal in the evening. Keep bags zipped and phones in a front pocket.', 18],
+        [180, 'Sample post', 'Tourist-friendly', 'C-Scheme', 'Well lit, busy cafes and a visible police presence in the evening. Comfortable for solo visitors.', 11],
+        [300, 'Sample post', 'Avoid', 'Jhotwara', 'Unlit stretch near the underpass after dark. Take a cab instead of walking.', 7]
       ]}
     }, FD = {};
 
@@ -705,7 +758,7 @@
       const c = FEEDS[t]; let data = store.get(c.key);
       if (!Array.isArray(data)) { data = c.seed.map((s, k) => ({ id: 's' + k, t: Date.now() - s[0] * 6e4, a: s[1], c: s[2], ar: s[3], city: 'jaipur', x: s[4], im: null, up: Array.from({ length: s[5] }, (_, q) => 's' + q), cm: [], uid: 'seed' })); store.set(c.key, data); }
       const root = $(c.el); FD[t] = { c, data, root, cat: 'All', sort: 'new' };
-      root.innerHTML = `<div class="fl"><form class="card pf" data-t="${t}"><h3>${c.title}</h3><input class="k nm" placeholder="Your name" maxlength="30" value="${esc(store.get('cp-name') || '')}" aria-label="Your name"><select class="k ct" aria-label="Category">${c.cats.map(x => `<option>${x}</option>`).join('')}</select><select class="k ar" aria-label="Area"></select><textarea class="tx" rows="4" maxlength="500" placeholder="${c.ph}" required></textarea><div class="pr"><label class="fu">Add photo<input type="file" accept="image/*" hidden></label><span class="sub fn"></span><button class="sb2">Post</button></div></form><div><div class="chips fc"></div><div class="lst"></div></div></div>`;
+      root.innerHTML = `<div class="fl"><form class="card pf" data-t="${t}"><h3>${c.title}</h3><input class="k nm" placeholder="Display name (optional)" maxlength="30" value="${esc(store.get('cp-name') || '')}" aria-label="Your name"><select class="k ct" aria-label="Category">${c.cats.map(x => `<option>${x}</option>`).join('')}</select><select class="k ar" aria-label="Area"></select><textarea class="tx" rows="4" maxlength="500" placeholder="${c.ph}" required></textarea><p class="sub" style="margin:0">Saved only in this browser. Do not name or photograph identifiable people.</p><div class="pr"><label class="fu">Add photo<input type="file" accept="image/*" hidden></label><span class="sub fn"></span><button class="sb2">Post</button></div></form><div><div class="chips fc"></div><div class="lst"></div></div></div>`;
       root.querySelector('input[type=file]').onchange = e => { root.querySelector('.fn').textContent = e.target.files[0] ? e.target.files[0].name.slice(0, 24) : ''; };
       paint(t);
     }
@@ -737,9 +790,9 @@
     }
 
     document.addEventListener('submit', async e => {
-      const f = e.target.closest('.pf'); if (!f) return; e.preventDefault();
+      const f = e.target.closest('.pf'); if (!f) return; e.preventDefault(); if (!f.querySelector('.tx').value.trim()) return toast('Write a few words before posting.');
       const t = f.dataset.t, S = FD[t], nm = f.querySelector('.nm').value.trim() || 'Guest', file = f.querySelector('input[type=file]').files[0], im = file ? await shrink(file) : null;
-      S.data.unshift({ id: 'p' + Date.now(), t: Date.now(), a: nm, c: f.querySelector('.ct').value, ar: f.querySelector('.ar').value, city: CK, x: f.querySelector('.tx').value.trim(), im, up: [], cm: [], uid: UID });
+      S.data.unshift({ id: 'p' + Date.now(), t: Date.now(), a: nm, c: f.querySelector('.ct').value, ar: f.querySelector('.ar').value, city: CK, x: f.querySelector('.tx').value.trim(), im: typeof im === 'string' ? im : null, up: [], cm: [], uid: UID });
       store.set('cp-name', nm);
       toast(store.set(S.c.key, S.data) ? 'Posted' : 'Posted for this session only. Browser storage is full or blocked.');
       f.querySelector('.tx').value = ''; f.querySelector('input[type=file]').value = ''; f.querySelector('.fn').textContent = '';
@@ -761,9 +814,84 @@
     addEventListener('storage', e => { for (const t in FD) if (e.key == FD[t].c.key) { FD[t].data = store.get(e.key) || []; paint(t); } });
     setInterval(() => { if (document.hidden || document.activeElement.closest('.po,.pf')) return; for (const t in FD) paint(t); }, 30000);
 
+    /* ===== Motion, briefing, alerts, method, guided tour ===== */
+    const tween = (el, v) => {
+      cancelAnimationFrame(el._r); const to = v == null ? null : Math.round(v);
+      if (to == null || to === el._to || matchMedia('(prefers-reduced-motion:reduce)').matches) { el.textContent = to == null ? '--' : to; el._to = to; el._cur = to || 0; return; }
+      const a = el._cur || 0, t0 = performance.now(); el._to = to;
+      const f = t => { const p = Math.min(1, (t - t0) / 600), x = Math.round(a + (to - a) * (1 - (1 - p) ** 3)); el.textContent = x; el._cur = x; if (p < 1) el._r = requestAnimationFrame(f); };
+      el._r = requestAnimationFrame(f);
+    };
+    const setMode = (c, t) => { const m = $('#mode'); m.className = 'badge ' + c; m.textContent = t; };
+
+    function renderBrief() {
+      const n = NOW(), c = city(n), box = $('#bf'), rows = Z.map(z => ({ z, s: score(z.i, n), an: anom(z.i, n) })).filter(o => o.s != null).sort((a, b) => a.s - b.s);
+      if (!rows.length) { box.innerHTML = '<p>Every feed is switched off, so there is nothing to report. Turn a feed back on from the dashboard.</p>'; return; }
+      const w = rows[0], b = rows[rows.length - 1], multi = rows.filter(o => o.an.length > 1), ad = adv(n), sim = F.filter(f => !/Open-Meteo/.test(SRC[f.k])).map(f => f.n.toLowerCase());
+      const when = new Date(T0 + n * 18e5).toLocaleString('en-GB', { weekday: 'long', hour: 'numeric', minute: '2-digit', timeZone: TZ });
+      const head = multi.length ? `Several readings are moving together in ${multi[0].z.n}` : c >= 65 ? `${C.n} is running steadily` : `${w.z.n} is under the most strain in ${C.n}`;
+      box.innerHTML = `<h2 class="hd">${head}</h2><p class="by">CityPulse desk · ${when}</p>
+        <p class="lead">The pulse for ${C.n} stands at ${Math.round(c)} out of 100, which we read as "${state(c).toLowerCase()}".</p>
+        <p>${w.z.n} scores lowest at ${Math.round(w.s)}${w.an.length ? ', with ' + w.an.map(f => bit(f, w.z, n)).join(', ') : ', though none of its readings is unusual'}. ${b.z.n} is the calmest area at ${Math.round(b.s)}.</p>
+        ${multi.slice(0, 3).map(o => `<p>In ${o.z.n}, ${o.an.map(f => f.n.toLowerCase()).join(' and ')} spiked at the same time. That may be related, but timing alone does not show that one caused the other.</p>`).join('')}
+        <h3>What residents can do</h3>${ad.length ? '<ul>' + ad.slice(0, 5).map(o => `<li><b>${o[1]}, ${o[2].toLowerCase()}.</b> ${o[3]}</li>`).join('') + '</ul>' : '<p>No weather-driven advisories are active.</p>'}
+        <p class="sub">${sim.length ? 'Note: ' + sim.join(' and ') + ' are simulated in this build, not official figures. ' : ''}Written automatically from the readings on the dashboard.</p>`;
+    }
+    $('#bfCopy').onclick = () => (navigator.clipboard ? navigator.clipboard.writeText($('#bf').innerText) : Promise.reject()).then(() => toast('Briefing copied'), () => toast('Copying is blocked here. Select the text instead.'));
+
+    const TH = Object.assign({ aqi: 150, rain: 3, temp: 38, pulse: 45 }, store.get('cp-th') || {});
+    const THD = [['aqi', 'Air quality index above', '', 50, 300, 5], ['rain', 'Rainfall above', ' mm/hr', .5, 20, .5], ['temp', 'Temperature above', ' °C', 25, 48, 1], ['pulse', 'Zone pulse below', '', 10, 80, 1]], THU = { aqi: '', rain: ' mm/hr', temp: ' °C', pulse: '' };
+    const buildTh = () => { $('#th').innerHTML = THD.map(([k, n, u, a, b, st]) => `<label class="th"><span>${n} <b id="tv-${k}">${TH[k]}${u}</b></span><input type="range" class="rs" data-th="${k}" min="${a}" max="${b}" step="${st}" value="${TH[k]}"></label>`).join(''); };
+    function renderAlerts() {
+      const n = NOW(), hits = [];
+      Z.forEach(z => {
+        const q = D.aqi[z.i][n], r = D.rain[z.i][n], t = D.temp[z.i][n], p = score(z.i, n);
+        if (q > TH.aqi) hits.push([z.n, 'Air quality', `AQI ${Math.round(q)} is above ${TH.aqi}`]);
+        if (r > TH.rain) hits.push([z.n, 'Rainfall', `${r.toFixed(1)} mm/hr is above ${TH.rain}`]);
+        if (t > TH.temp) hits.push([z.n, 'Temperature', `${t.toFixed(1)}°C is above ${TH.temp}`]);
+        if (p != null && p < TH.pulse) hits.push([z.n, 'Zone pulse', `${Math.round(p)} is below ${TH.pulse}`]);
+      });
+      $('#alt').textContent = `${hits.length} reading${hits.length == 1 ? '' : 's'} over threshold in ${C.n}`;
+      $('#al').innerHTML = hits.length ? hits.map(h => `<div class="lk"><b>${h[0]}</b><span>${h[1]}: ${h[2]}.</span></div>`).join('') : '<p class="sub">Nothing is over your thresholds right now.</p>';
+      const sig = hits.map(h => h[0] + h[1]).join('|');
+      if (sig && sig !== renderAlerts.sig && $('#nt').checked && window.Notification && Notification.permission == 'granted') new Notification('CityPulse alert', { body: `${hits[0][0]}: ${hits[0][2]}${hits.length > 1 ? ` (+${hits.length - 1} more)` : ''}` });
+      renderAlerts.sig = sig;
+    }
+    document.addEventListener('input', e => { const k = e.target.dataset && e.target.dataset.th; if (!k) return; TH[k] = +e.target.value; $('#tv-' + k).textContent = TH[k] + THU[k]; store.set('cp-th', TH); renderAlerts(); });
+    $('#nt').onchange = e => { if (!e.target.checked) return; if (!window.Notification) { e.target.checked = false; return toast('This browser does not support notifications.'); } Notification.requestPermission().then(p => { if (p != 'granted') { e.target.checked = false; toast('Notifications were not allowed.'); } }); };
+
+    const SRCN = { temp: 'Open-Meteo forecast API', hum: 'Open-Meteo forecast API', cld: 'Open-Meteo forecast API', rain: 'Open-Meteo forecast API', aqi: 'Open-Meteo air quality API (US AQI)', tr: 'Modelled from rush hours and rainfall', cm: 'Simulated 311-style complaint rate' };
+    function renderAbout() { $('#srcb').innerHTML = F.map(f => `<tr><td>${f.n}</td><td>${SRCN[f.k]}</td><td>${/Open-Meteo/.test(SRC[f.k]) ? 'Live' : 'Simulated'}</td><td>${Math.round(f.w * 100)}%</td></tr>`).join(''); }
+
+    const TS = [
+      { t: 'Welcome to CityPulse', p: 'One glance should tell you how your neighbourhood is really doing. CityPulse combines weather, air quality, rainfall, transit delay and complaint data into a single reading for each zone, flags anything unusual, and explains it in plain language.', u: ['Made for residents, journalists and city staff. Built for AmiHacks 1.0, Track B.', 'Weather and air quality are live. Transit delay and complaints are modelled and always labelled.', 'Links between feeds are possible connections, never confirmed causes.'] },
+      { tab: 'dash', s: '.hero', t: 'The city pulse', p: 'The large number averages every zone, where 100 is calm. Colour and heartbeat speed rise with strain. The sentence below names the zone under most pressure.' },
+      { tab: 'dash', s: '.mp', t: 'Map and layers', p: 'Each marker is a zone. Pick a layer to colour the map by one feed, select a marker to inspect that zone, or switch to satellite. Use the city buttons at the top to change city.' },
+      { tab: 'dash', s: '.tl', t: 'Replay the last 48 hours', p: 'Press play or drag the scrubber to watch the pulse change over time and see where feeds moved together.' },
+      { tab: 'dash', s: '#fo', t: 'Try a feed outage', p: 'Switch a feed off to see the pulse recalculate without it. CityPulse keeps working when a source goes missing.' },
+      { tab: 'brief', s: '#bf', t: 'Daily briefing', p: 'A short bulletin written from the current readings, with practical advice. Copy it or print it.' },
+      { tab: 'alerts', s: '#th', t: 'Set your own alerts', p: 'Choose the air quality, rainfall, heat and pulse levels you care about. Zones that cross them are listed instantly.' },
+      { tab: 'feed', s: '#fh', t: 'Community reports', p: 'Post hygiene hazards and safety tips, upvote and comment. Posts stay in your browser. Use a nickname and avoid identifying anyone.' },
+      { tab: 'about', s: '#v-about .card:nth-of-type(2)', t: 'Method and sources', p: 'See which feeds are live and which are simulated, how the score is worked out, and the limits of the tool. You can reopen this tour any time from the sidebar.' }
+    ];
+    let ti = -1, hlEl = null;
+    function tour(n) {
+      if (hlEl) { hlEl.classList.remove('hl'); hlEl = null; }
+      const box = $('#tour'), bd = $('#tourBd');
+      if (n < 0 || n >= TS.length) { ti = -1; box.hidden = bd.hidden = true; store.set('cp-tour', 1); tab('dash'); return; }
+      ti = n; const s = TS[n]; box.hidden = false; box.classList.toggle('intro', n == 0); bd.hidden = n > 0;
+      $('#tourT').textContent = s.t; $('#tourP').textContent = s.p; $('#tourU').innerHTML = (s.u || []).map(x => `<li>${x}</li>`).join('');
+      $('#tourDots').textContent = `Step ${n + 1} of ${TS.length}`; $('#tourBack').hidden = n == 0; $('#tourNext').textContent = n == 0 ? 'Start the walkthrough' : n == TS.length - 1 ? 'Finish' : 'Next';
+      if (s.tab) { tab(s.tab); const e = $(s.s); if (e) { hlEl = e; e.classList.add('hl'); setTimeout(() => e.scrollIntoView({ block: 'start', behavior: 'smooth' }), 120); } }
+      $('#tourNext').focus({ preventScroll: true });
+    }
+    $('#tourNext').onclick = () => tour(ti + 1); $('#tourBack').onclick = () => tour(ti - 1); $('#tourSkip').onclick = () => tour(-1);
+    document.addEventListener('keydown', e => { if (e.key == 'Escape' && ti >= 0) tour(-1); });
+
     // Initialization
-    mount('hygiene'); mount('safety'); fillAreas(); setTheme(store.get('cp-theme') || 'dark');
+    mount('hygiene'); mount('safety'); fillAreas(); buildTh(); $('#dl').textContent = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); setTheme(store.get('cp-theme') || 'light');
     switchCity('jaipur');
+    if (!store.get('cp-tour')) setTimeout(() => tour(0), 700);
   </script>
 </body>
 </html>
