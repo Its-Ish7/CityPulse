@@ -533,7 +533,7 @@
     /* --- MAP TILES WITH SATELLITE & CARTO SWITCHER --- */
     const M = L.map('map', { zoomControl: false, attributionControl: true, minZoom: 8, maxZoom: 15 });
     
-    const bt = n => L.tileLayer(`https://{s}.basemaps.cartocdn.com/${n}/{z}/{x}/{y}{r}.png`, { subdomains: 'abcd', maxZoom: 19, attribution: '© OpenStreetMap contributors © CARTO' });
+    const bt = n => L.tileLayer(`https://{s}.basemaps.cartocdn.com/${n}/{z}/{x}/{y}{r}.png?key=cb1_3w7x_1_1a0bb98f9f66fbc574799e98`, { subdomains: 'abcd', maxZoom: 19, attribution: '© OpenStreetMap contributors © CARTO' });
 const lightT = bt('light_all'), darkT = bt('dark_all'), satTiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Imagery © Esri' });
     let isSatellite = false;
 swapTiles();
