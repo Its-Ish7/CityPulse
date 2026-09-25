@@ -36,5 +36,3 @@ CityPulse is built as a **serverless, client-side application** designed for max
 * **Data Persistence:** Client-side `localStorage` (Privacy-first; zero user tracking or backend database required)
 
 ---
-
-## 🔬 How the Pipeline Works
