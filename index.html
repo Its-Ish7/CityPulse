@@ -14,8 +14,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
   <style>
     /* Theme: cream and umber (light), warm charcoal (dark) */
-    :root[data-theme=light] { --bg:#F1E8D8; --sb:#EADFCB; --card:#FAF5EA; --card-border:#D6C7AC; --ink:#2B2117; --mut:#6B5A45; --line:#E2D6BF; --ac:#6A4E33; --acrgb:106,78,51; --acink:#FAF5EA; --ac-glow:transparent; --sh:0 1px 0 rgba(90,64,36,.06); --ok:#5F7A4E; --wr:#A87B2A; --bad:#9C3D2E; color-scheme:light; }
-    :root[data-theme=dark] { --bg:#17130F; --sb:#1C1814; --card:#211C16; --card-border:#3B3227; --ink:#ECE3D2; --mut:#A39680; --line:#2E271E; --ac:#C8A97E; --acrgb:200,169,126; --acink:#17130F; --ac-glow:transparent; --sh:none; --ok:#8FAE7C; --wr:#D2A650; --bad:#D97A66; color-scheme:dark; }
+    :root[data-theme=light] { --bg:#F1E8D8; --sb:#EADFCB; --card:#FAF5EA; --card-border:#D6C7AC; --ink:#2B2117; --mut:#6B5A45; --line:#E2D6BF; --ac:#6A4E33; --acrgb:106,78,51; --acink:#FAF5EA; --ac-glow:transparent; --sh:0 1px 0 rgba(90,64,36,.06); --ok:#5F7A4E; --wr:#A87B2A; --bad:#9C3D2E; --pop:#D9770E; --poprgb:217,119,14; color-scheme:light; }
+    :root[data-theme=dark] { --bg:#17130F; --sb:#1C1814; --card:#211C16; --card-border:#3B3227; --ink:#ECE3D2; --mut:#A39680; --line:#2E271E; --ac:#C8A97E; --acrgb:200,169,126; --acink:#17130F; --ac-glow:transparent; --sh:none; --ok:#8FAE7C; --wr:#D2A650; --bad:#D97A66; --pop:#F2A63D; --poprgb:242,166,61; color-scheme:dark; }
 
     /* Global Reset & Typography */
     * { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--card-border) transparent; }
@@ -229,10 +229,58 @@
     }
     @media print { #sb, .chips, #toast, #tour, #tourBd, footer { display: none !important; } }
     @media(prefers-reduced-motion: reduce) { *, ::before { animation: none !important; transition: none !important; } }
+
+    /* ---- Loading / splash screen ---- */
+    #splash { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: var(--bg); transition: opacity .55s cubic-bezier(.4,0,.2,1), visibility .55s; }
+    #splash::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 50% at 50% 42%, rgba(var(--poprgb),.12), transparent 70%); }
+    #splash.out { opacity: 0; visibility: hidden; pointer-events: none; }
+    .splash-mark { position: relative; font: 800 15px Newsreader, Georgia, serif; font-size: clamp(30px, 6vw, 46px); letter-spacing: -.03em; color: var(--ink); opacity: 0; transform: translateY(10px) scale(.97); animation: splashIn .8s cubic-bezier(.16,1,.3,1) .15s forwards; }
+    .splash-mark i { font-style: normal; color: var(--pop); }
+    .splash-status { position: relative; font: 600 12px "Libre Franklin", system-ui, sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--mut); opacity: 0; animation: splashIn .7s ease .45s forwards; }
+    .splash-status::after { content: ""; display: inline-block; width: 5px; height: 5px; margin-left: 8px; border-radius: 50%; background: var(--pop); animation: splashDot 1.1s ease-in-out infinite; vertical-align: middle; }
+    @keyframes splashIn { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes splashDot { 0%,100% { opacity: .25; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.15); } }
+    .app { opacity: 0; animation: appIn .7s cubic-bezier(.16,1,.3,1) .25s forwards; }
+    @keyframes appIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    @media(prefers-reduced-motion: reduce) { .splash-mark, .splash-status, .app { animation: none !important; opacity: 1 !important; transform: none !important; } }
+
+    /* ---- Tactile / satisfying interaction polish ---- */
+    button, .nv, .c, a, .zn, input[type=range] { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    .nv, button.c, .fu, .sb2, .ab, #pp, #tg, #tourbtn, #tourbtn2 { transition: transform .15s cubic-bezier(.34,1.56,.64,1), background-color .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease; }
+    .nv:active, button.c:active, .fu:active, .sb2:active, .ab:active, #pp:active { transform: scale(.94); }
+    .nv[aria-current=true] { position: relative; }
+    .nv[aria-current=true]::before { content: ""; position: absolute; left: 2px; top: 50%; transform: translateY(-50%); width: 3px; height: 60%; border-radius: 3px; background: var(--pop); }
+    a.card.xb, button.card.xb { transition: transform .18s cubic-bezier(.34,1.56,.64,1), border-color .18s ease, box-shadow .18s ease; }
+    .card.xb:hover { transform: translateY(-2px); border-color: var(--ac); } .card.xb:active { transform: translateY(0) scale(.98); }
+    .zn { transition: transform .15s cubic-bezier(.34,1.56,.64,1); } .zn:active .dot { transform: scale(.9); }
+    .view.on { animation: viewIn .38s cubic-bezier(.16,1,.3,1); }
+    @keyframes viewIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .big { transition: color .3s ease; }
+    #sc.big { text-shadow: 0 0 34px rgba(var(--poprgb),.22); }
+    .badge.ok::before { box-shadow: 0 0 0 3px rgba(var(--poprgb),.18); }
+    #toast { border: 1px solid rgba(var(--poprgb),.35); }
+    ::selection { background: rgba(var(--poprgb),.35); }
+
+    /* ---- Homepage warmth ---- */
+    #greet { font: 500 14.5px "Libre Franklin", system-ui, sans-serif; color: var(--mut); margin: 2px 0 0; }
+    #greet b { color: var(--ink); font-weight: 700; }
+
+    /* ---- Tour: refined for touch ---- */
+    .tb { -webkit-overflow-scrolling: touch; }
+    #tourNext, #tourBack, #tourSkip { min-height: 40px; }
+    @media(max-width: 760px) {
+      #tourNext, #tourBack, #tourSkip { padding: 10px 16px; font-size: 13.5px; }
+      .tf2 { padding-bottom: calc(14px + env(safe-area-inset-bottom)); }
+      #tour h2 { font-size: 19px; }
+    }
   </style>
   <link rel="stylesheet" href="extras.css">
 </head>
 <body>
+  <div id="splash" aria-hidden="true">
+    <div class="splash-mark">City<i>Pulse</i></div>
+    <div class="splash-status" id="splashStatus">Initializing</div>
+  </div>
   <div class="app">
     <!-- Sidebar -->
     <aside id="sb">
@@ -258,7 +306,7 @@
       <!-- Dashboard View -->
       <div id="v-dash" class="view on">
         <header>
-          <div><div class="date" id="dl"></div><h1>CityPulse <span id="cn">Jaipur</span></h1></div>
+          <div><div class="date" id="dl"></div><h1>CityPulse <span id="cn">Jaipur</span></h1><div class="sub" id="greet"></div></div>
           <nav class="chips" id="cities" aria-label="City">
             <button class="c" data-c="jaipur">Jaipur</button>
             <button class="c" data-c="delhi">Delhi</button>
@@ -556,7 +604,7 @@
     /* --- MAP TILES WITH SATELLITE & CARTO SWITCHER --- */
     const M = L.map('map', { zoomControl: false, attributionControl: true, minZoom: 8, maxZoom: 15 });
     
-    const bt = n => L.tileLayer(`https://{s}.basemaps.cartocdn.com/${n}/{z}/{x}/{y}{r}.png`, { subdomains: 'abcd', maxZoom: 19, attribution: '© OpenStreetMap contributors © CARTO' });
+    const bt = n => L.tileLayer(`https://{s}.basemaps.cartocdn.com/${n}/{z}/{x}/{y}{r}.png?key=cb1_3w7x_1_1a0bb98f9f66fbc574799e98`, { subdomains: 'abcd', maxZoom: 19, attribution: '© OpenStreetMap contributors © CARTO' });
 const lightT = bt('light_all'), darkT = bt('dark_all'), satTiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Imagery © Esri' });
     let isSatellite = false;
 swapTiles();
@@ -703,7 +751,8 @@ swapTiles();
       gen(); sel = null; i = 60; play = !matchMedia('(prefers-reduced-motion:reduce)').matches;
       buildMap();
       $('#cn').textContent = C.n;
-      
+      if ($('#greetCity')) $('#greetCity').textContent = C.n;
+
       setMode('', 'Connecting to live data…');
       
       render(); fillAreas(); refreshViews(); covid(); live();
@@ -1133,8 +1182,17 @@ const s = Object.values(timelineObj.cases), d = s.slice(1).map((v, j) => Math.ma
 
     // Initialization
     mount('hygiene'); mount('safety'); fillAreas(); buildTh(); $('#dl').textContent = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); setTheme(store.get('cp-theme') || 'light');
+    (() => { const h = new Date().getHours(), g = h < 5 ? 'up late' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : h < 21 ? 'Good evening' : 'Good evening', el = $('#greet'); if (el) el.innerHTML = `${g}. Here's how <b id="greetCity">Jaipur</b> is doing right now.`; })();
     switchCity('jaipur');
     if (!store.get('cp-tour')) setTimeout(() => tour(0), 700);
+
+    // Splash screen: swap the status line once, then fade out as the dashboard settles in
+    setTimeout(() => { const s = $('#splashStatus'); if (s) s.textContent = 'Loading live data'; }, 550);
+    setTimeout(() => {
+      const sp = $('#splash'); if (!sp) return;
+      sp.classList.add('out');
+      setTimeout(() => sp.remove(), 650);
+    }, 1150);
   </script>
   <script src="extras.js"></script>
 </body>
