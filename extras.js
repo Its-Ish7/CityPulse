@@ -77,17 +77,6 @@
       `<div class="chips"><button class="c" id="csv">Download ${esc(C.n)} data (CSV)</button></div>`;
   }
 
-  /* ---------- Ticker ---------- */
-  function ticker() {
-    const n = NOW(), c = city(n), it = [], d = X.d, rows = Z.map(z => ({ z, s: score(z.i, n) })).filter(o => o.s != null).sort((a, b) => a.s - b.s);
-    if (c != null && rows.length) it.push(`${C.n} pulse ${R(c)}: ${state(c).toLowerCase()}`, `${rows[0].z.n} is under the most strain at ${R(rows[0].s)}`);
-    it.push(`Highest air quality reading: AQI ${R(Math.max(...Z.map(z => D.aqi[z.i][n])))}`);
-    const t = d.quakes && d.quakes.length && d.quakes.reduce((a, b) => b.m > a.m ? b : a); if (t) it.push(`Strongest quake this week: M${t.m}, ${t.pl}`);
-    if (d.news && d.news[0]) it.push(d.news[0].title);
-    const s = it.map(x => `<span>${esc(x)}</span>`).join('');
-    $('#tk').innerHTML = `<b class="lvb">${LIVE ? 'Live' : 'Demo'}</b><div>${s}${s}</div>`;
-  }
-
   /* ---------- Community hub ---------- */
   const CI = [['Fresh air', '🌿'], ['Hazy or smoky', '😷'], ['Waterlogged', '🌧️'], ['Too hot', '🥵'], ['Calm', '😌']], LV = [[0, 'Newcomer'], [20, 'Neighbour'], [60, 'Scout'], [120, 'Guardian'], [250, 'Champion']];
   const mine = () => Object.values(FD).flatMap(S => S.data).filter(p => p.uid == UID), cis = () => store.get('cp-ci') || [], wl = () => store.get('cp-watch') || [];
@@ -145,5 +134,6 @@
 
   const tk = document.createElement('div'); tk.id = 'tk'; tk.setAttribute('aria-label', 'Live headlines'); $('#v-dash header').after(tk);
   $('.hero').insertAdjacentHTML('beforeend', '<div class="chips" style="margin-top:14px"><button class="c" id="shb">Share this pulse</button></div>');
+  window.CPX = { X, csv, mine, cis, LV }; // read-only hooks for the guided walkthrough in index.html
   X.w = null; paintWorld(); world(); refresh();
 })();
