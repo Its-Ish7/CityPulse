@@ -1188,7 +1188,8 @@ const s = Object.values(timelineObj.cases), d = s.slice(1).map((v, j) => Math.ma
     if (!store.get('cp-tour')) setTimeout(() => tour(0), 700);
 
     // Splash screen: swap the status line once, then fade out as the dashboard settles in
-    setTimeout(() => { const s = $('#splashStatus'); if (s) s.textContent = 'Loading live data'; }, 550);
+    setTimeout(() => { const s = $('#splashStatus'); if (s) s.textContent = 'Of the People, By the People, For the People - <br> Abraham Lincon
+'; }, 550);
     setTimeout(() => {
       const sp = $('#splash'); if (!sp) return;
       sp.classList.add('out');
