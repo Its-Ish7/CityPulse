@@ -1,27 +1,40 @@
-# CityPulse
+# CityPulse — Live Civic Health Dashboard
 
-Live civic health dashboard. Static site: `index.html`, `extras.css`, `extras.js`. No build step, no keys.
+> **One real-time reading for how your neighborhood is doing.**  
+> CityPulse synthesizes live weather, air quality, rainfall, transit delay, and community reports into a unified 0–100 **Civic Health Score** for every neighborhood.
 
-## Guided walkthrough (built in)
-Sidebar > **Take the tour** (untimed, for visitors) or **Timed demo** (presenter mode).
-It follows the presentation slide by slide. Each step highlights the part of the app that slide is about, says what you are looking at, explains how it is coded ("Under the hood"), and shows a **live worked example** computed from the data on screen. "Try it" buttons perform the demo action and undo it when you move on. Keys: `→` next, `←` back, `Esc` close.
+---
 
-| Step | Slide | Where it goes |
-|---|---|---|---|
-| 1 | 2 Architecture | Method > pipeline | (shows hosts contacted and what is in localStorage) |
-| 2 | 3 Live ingestion | Dashboard header, badge | (shows live / modelled / simulated feeds) |
-| 3 | 4 Fault tolerance | Feed outage buttons | Switch off Air quality |
-| 4 | 5 Normalisation and score | Map layer buttons | Colour map by Air / Rain (worked score example) |
-| 5 | 6 Z-score anomalies | Zone Telemetry | Jump to the biggest spike |
-| 6 | 7 Global reach | Cities search | Search "Oslo", open it |
-| 7 | 8 Heartbeat | Hero card | Calmest / most stressed moment (pulse to bpm to colour) |
-| 8 | 9 Animation and Leaflet | Map | Satellite, dark theme |
-| 9 | 10 48-hour scrubber | Timeline | Jump to worst moment, play |
-| 10 | 11 Community (reports) | Hygiene reports | Filter, top voted |
-| 11 | 11 Community (check-ins) | Community | Check in, share pulse card |
-| 12 | 12 Live desk | Live desk | (shows which of the 5 feeds responded) |
-| 13 | 13 Briefing | Briefing | Copy briefing |
-| 14 | 13 Alerts and CSV | Alerts | Tighten AQI alert, download CSV |
+## 📋 Overview
 
-**Timed demo:** the clock starts when you press "Start the clock" and shows elapsed time against the plan for each step ("on pace", "0:20 behind"). Choose a 7 or 8 minute slot on the first screen. To change the default, edit `TALK0` (seconds) in `index.html`; per-step budgets are the `w` weights on each step and are scaled to fit.
+During extreme weather events, pollution spikes, or local infrastructure failures, residents often find out about hazardous conditions only after encountering them. **CityPulse** bridges this gap by aggregating multiple disparate telemetry feeds into a single, intuitive interface. 
 
+It calculates an active **City Pulse** and **Heartbeat (BPM)** that accelerates as civic strain increases, performs real-time **Z-score anomaly detection** to flag unusual local conditions, and auto-generates plain-language daily briefings for residents and officials alike.
+
+---
+
+## ✨ Key Features
+
+* **Unified Civic Health Score (0–100):** Normalizes incommensurable metrics (AQI, temperature, rainfall, traffic delay, complaint rates) into a single actionable strain index per zone.
+* **Dynamic City Heartbeat:** Visualizes city strain through a real-time animated ECG canvas and color gradient that responds dynamically to overall city stress.
+* **48-Hour Historical Scrubber & Replay:** Drag to inspect multi-feed correlations, replay historical strain trends, and pinpoint multi-feed spikes over the last two days.
+* **Automated Daily Briefings:** Auto-generates plain-language bulletins highlighting the most strained zones, multi-feed coincidences, and recommended resident actions.
+* **Interactive GIS Map:** Built with Leaflet, featuring satellite/street view toggling, dark/light themes, and animated GPU-composited pulse markers indicating zone strain.
+* **Crowdsourced Community Feeds:** Localized hazard reporting (open sewers, stagnant water, safety advisories) with client-side image compression and local storage support.
+* **Custom Threshold Alerts & CSV Export:** Configure custom parameters for AQI, rainfall, and heat to receive browser notifications or export zone telemetry for municipal research.
+* **Multi-City Support & Geocoding:** Live weather/air quality fetching for default supported cities or any globally geocoded location.
+
+---
+
+## 🛠️ Tech Stack & Architecture
+
+CityPulse is built as a **serverless, client-side application** designed for maximum availability and zero backend maintenance during emergencies.
+
+* **Frontend:** Vanilla HTML5, CSS3, JavaScript (ES6+)
+* **Mapping & GIS:** [Leaflet.js](https://leafletjs.com/) with CARTO Basemaps & Esri World Imagery
+* **Live Environmental Feeds:** [Open-Meteo API](https://open-meteo.com/) (Forecast & Air Quality APIs)
+* **Data Persistence:** Client-side `localStorage` (Privacy-first; zero user tracking or backend database required)
+
+---
+
+## 🔬 How the Pipeline Works
